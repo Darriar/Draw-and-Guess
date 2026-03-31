@@ -9,6 +9,7 @@ import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
+import javafx.scene.shape.StrokeLineCap
 import java.io.PrintWriter
 
 class DrawController {
@@ -28,10 +29,25 @@ class DrawController {
     private lateinit var gc: GraphicsContext    // Объект "кисть" для рисования
     private lateinit var out: PrintWriter       // Этот объект создан при подключении к сокету
 
+    data class DrawLine(
+        val x1: Double, val y1: Double, // Старт (в %)
+        val x2: Double, val y2: Double, // Конец (в %)
+    )
+
+    private val drawHistory = mutableListOf<DrawLine>()
+    private var lastX: Double = 0.0
+    private var lastY: Double = 0.0
+
     @FXML
     fun initialize() {
         gameCanvas.widthProperty().bind(canvasContainer.widthProperty())
         gameCanvas.heightProperty().bind(canvasContainer.heightProperty())
+
+        canvasContainer.minWidth = 0.0
+        canvasContainer.minHeight = 0.0
+
+        gameCanvas.widthProperty().addListener { _ -> redraw() }
+        gameCanvas.heightProperty().addListener { _ -> redraw() }
 
         sizeSlider.min = 1.0
         sizeSlider.max = 30.0
@@ -46,34 +62,44 @@ class DrawController {
         colorPicker.valueProperty().addListener { _, _, newColor ->
             gc.stroke = newColor
         }
-        gc.lineCap = javafx.scene.shape.StrokeLineCap.ROUND
+        gc.lineCap = StrokeLineCap.ROUND
 
-        val socket = ToServer.connect(chatTextArea, gc, gameCanvas)
+        val socket = ToServer.connect(chatTextArea, gameCanvas)
         out = PrintWriter(socket!!.getOutputStream(), true)     // МОЖЕТ БЫТЬ NULL
         out.println("Darya") // ПОЛЬЗОВАТЕЛЬКИЕ ИМЕНА
-
 
         setupDrawingEvents()
     }
 
+    private fun drawLineOnCanvas(line: DrawLine) {
+        gc.strokeLine(line.x1 * gameCanvas.width, line.y1 * gameCanvas.height,
+                      line.x2 * gameCanvas.width, line.y2 * gameCanvas.height)
+    }
+
+    private fun redraw() {
+        gc.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
+        drawHistory.forEach { drawLineOnCanvas(it) }
+    }
+
     private fun setupDrawingEvents() {
         gameCanvas.setOnMousePressed { event ->
-            val x = event.x
-            val y = event.y
-            gc.beginPath()
-           // gc.moveTo(event.x, event.y) // Перемещаем "перо" в точку нажатия
-            gc.stroke()
-
-            out.println("START:$x,$y")
+            lastX = event.x / gameCanvas.width
+            lastY = event.y / gameCanvas.height
         }
 
         gameCanvas.setOnMouseDragged { event ->
-            val x = event.x
-            val y = event.y
-            gc.lineTo(event.x, event.y)
-            gc.stroke()
+            val currentX = event.x / gameCanvas.width
+            val currentY = event.y / gameCanvas.height
 
-            out.println("DRAW:$x,$y")
+            val line = DrawLine(lastX, lastY, currentX, currentY)
+            drawHistory.add(line)
+
+            drawLineOnCanvas(line)
+
+            out.println("DRAW:${lastX},${lastY},${currentX},${currentY},${colorPicker.value},${sizeSlider.value}")
+
+            lastX = currentX
+            lastY = currentY
         }
     }
 
@@ -92,6 +118,7 @@ class DrawController {
         val height = gameCanvas.height
 
         gc.clearRect(0.0, 0.0, width, height)
+        drawHistory.clear()
         out.println("CLEAR")
     }
 }

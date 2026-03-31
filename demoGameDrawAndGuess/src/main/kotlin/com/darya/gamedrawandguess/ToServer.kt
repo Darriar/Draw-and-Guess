@@ -1,8 +1,9 @@
 package com.darya.gamedrawandguess
 
 import javafx.scene.canvas.Canvas
-import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.TextArea
+import javafx.scene.paint.Color
+import javafx.scene.shape.StrokeLineCap
 import java.net.InetAddress
 import java.net.Socket
 import java.util.*
@@ -10,12 +11,12 @@ import java.util.*
 class ToServer {
 
     companion object {
-        fun connect(chat: TextArea, gc: GraphicsContext, gameCanvas: Canvas): Socket? {
+        fun connect(chat: TextArea, gameCanvas: Canvas): Socket? {
             try {
                 val localhost = InetAddress.getLocalHost().hostAddress
                 println(localhost)
-                val socket = Socket("10.177.142.105", 8080)
-                startListening(chat, socket, gc, gameCanvas)
+                val socket = Socket("localhost", 8080)     // 10.177.142.105
+                startListening(chat, socket, gameCanvas)
                 chat.appendText("Система: Вы подключены к серверу!\n")
                 return socket
             } catch (e: Exception) {
@@ -24,24 +25,30 @@ class ToServer {
             }
         }
 
-        private fun processMessage(chat: TextArea, message: String, gc: GraphicsContext,gameCanvas: Canvas) {
+        private fun processMessage(chat: TextArea, message: String, gameCanvas: Canvas) {
             try {
                 when {
                     message.startsWith("CHAT:") -> {
                         chat.appendText(message.substring(5) + "\n")
                     }
-                    message.startsWith("START:") -> {
-                        val coords = message.substring(6).split(",")
-                        gc.beginPath()
-                        gc.moveTo(coords[0].toDouble(), coords[1].toDouble())
-
-                    }
                     message.startsWith("DRAW:") -> {
-                        val coords = message.substring(5).split(",")
-                        gc.lineTo(coords[0].toDouble(), coords[1].toDouble())
-                        gc.stroke()
+                        val data = message.removePrefix("DRAW").split(",")
+                        val lastX = data[0].toDouble(); val lastY = data[1].toDouble()
+                        val currentX = data[2].toDouble(); val currentY = data[3].toDouble()
+                        val color = Color.web(data[4])
+                        val size = data[5].toDouble()
+
+
+                        val gc = gameCanvas.graphicsContext2D
+                        gc.stroke = color
+                        gc.lineWidth = size
+                        gc.lineCap = StrokeLineCap.ROUND
+
+                        gc.strokeLine(lastX * gameCanvas.width, lastY * gameCanvas.height,
+                                      currentX * gameCanvas.width, currentY * gameCanvas.height)
                     }
                     message == "CLEAR" -> {
+                        val gc = gameCanvas.graphicsContext2D
                         gc.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
                     }
                 }
@@ -50,7 +57,7 @@ class ToServer {
             }
         }
 
-        private fun startListening(chat: TextArea, socket: Socket, gc: GraphicsContext, gameCanvas: Canvas) {
+        private fun startListening(chat: TextArea, socket: Socket, gameCanvas: Canvas) {
             val input = Scanner(socket.getInputStream())
 
             Thread {
@@ -59,7 +66,7 @@ class ToServer {
                         val message = input.nextLine()
 
                         javafx.application.Platform.runLater {
-                            processMessage(chat, message, gc, gameCanvas)
+                            processMessage(chat, message, gameCanvas)
                         }
                     }
                 } catch (e: Exception) {
@@ -71,3 +78,5 @@ class ToServer {
         }
     }
 }
+
+// один рисует у другого при масштабировании все слетает так как не записывается в историю
