@@ -10,7 +10,7 @@ class Server {
 
     fun broadcast(message: String, sender: ClientHandler?) {
         for (client in clients) {
-           // if (client != sender)
+            //if (client != sender || !message.startsWith("CHAT:"))
                 client.sendMessage(message)
         }
     }
