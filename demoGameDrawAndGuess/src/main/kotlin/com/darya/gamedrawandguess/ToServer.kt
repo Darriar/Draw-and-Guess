@@ -32,12 +32,11 @@ class ToServer {
                         chat.appendText(message.substring(5) + "\n")
                     }
                     message.startsWith("DRAW:") -> {
-                        val data = message.removePrefix("DRAW").split(",")
+                        val data = message.removePrefix("DRAW:").split(",")
                         val lastX = data[0].toDouble(); val lastY = data[1].toDouble()
                         val currentX = data[2].toDouble(); val currentY = data[3].toDouble()
                         val color = Color.web(data[4])
                         val size = data[5].toDouble()
-
 
                         val gc = gameCanvas.graphicsContext2D
                         gc.stroke = color
@@ -46,6 +45,10 @@ class ToServer {
 
                         gc.strokeLine(lastX * gameCanvas.width, lastY * gameCanvas.height,
                                       currentX * gameCanvas.width, currentY * gameCanvas.height)
+
+                        val drawingHistory = DrawingHistory
+                        val line = LineData(lastX, lastY, currentX, currentY, color, size)
+                        drawingHistory.add(line)
                     }
                     message == "CLEAR" -> {
                         val gc = gameCanvas.graphicsContext2D

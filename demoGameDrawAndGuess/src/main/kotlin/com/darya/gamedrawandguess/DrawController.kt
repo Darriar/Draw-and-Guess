@@ -29,12 +29,7 @@ class DrawController {
     private lateinit var gc: GraphicsContext    // Объект "кисть" для рисования
     private lateinit var out: PrintWriter       // Этот объект создан при подключении к сокету
 
-    data class DrawLine(
-        val x1: Double, val y1: Double, // Старт (в %)
-        val x2: Double, val y2: Double, // Конец (в %)
-    )
-
-    private val drawHistory = mutableListOf<DrawLine>()
+    private var drawingHistory = DrawingHistory
     private var lastX: Double = 0.0
     private var lastY: Double = 0.0
 
@@ -71,14 +66,20 @@ class DrawController {
         setupDrawingEvents()
     }
 
-    private fun drawLineOnCanvas(line: DrawLine) {
+    private fun drawLineOnCanvas(line: LineData) {
+        val gc = gameCanvas.graphicsContext2D
+        gc.lineWidth = line.size
+        gc.stroke = line.color
+        gc.lineCap = StrokeLineCap.ROUND
+
         gc.strokeLine(line.x1 * gameCanvas.width, line.y1 * gameCanvas.height,
                       line.x2 * gameCanvas.width, line.y2 * gameCanvas.height)
     }
 
     private fun redraw() {
         gc.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
-        drawHistory.forEach { drawLineOnCanvas(it) }
+        for (line in drawingHistory)
+            drawLineOnCanvas(line)
     }
 
     private fun setupDrawingEvents() {
@@ -91,8 +92,8 @@ class DrawController {
             val currentX = event.x / gameCanvas.width
             val currentY = event.y / gameCanvas.height
 
-            val line = DrawLine(lastX, lastY, currentX, currentY)
-            drawHistory.add(line)
+            val line = LineData(lastX, lastY, currentX, currentY, colorPicker.value, sizeSlider.value)
+            drawingHistory.add(line)
 
             drawLineOnCanvas(line)
 
@@ -118,7 +119,7 @@ class DrawController {
         val height = gameCanvas.height
 
         gc.clearRect(0.0, 0.0, width, height)
-        drawHistory.clear()
+        drawingHistory.clear()
         out.println("CLEAR")
     }
 }
