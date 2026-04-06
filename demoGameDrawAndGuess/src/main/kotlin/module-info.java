@@ -4,6 +4,6 @@ module com.darya.gamedrawandguess {
     requires kotlin.stdlib;
 
 
-    opens com.darya.gamedrawandguess to javafx.fxml;
+    opens com.darya.gamedrawandguess.ui to javafx.fxml;
     exports com.darya.gamedrawandguess;
 }

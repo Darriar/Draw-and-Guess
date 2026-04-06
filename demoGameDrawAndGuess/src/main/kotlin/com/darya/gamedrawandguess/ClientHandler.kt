@@ -7,13 +7,18 @@ import java.util.*
 class ClientHandler(private val socket: Socket, private val server: Server): Thread()  {
     private val input = Scanner(socket.getInputStream())
     private val output = PrintWriter(socket.getOutputStream(), true)
-    var playerName = ""
+    val id: Socket = socket
+    var score: Int = 0
     var isDrawing = false
+    var userName: String = ""
+        set(value) { field = value.trim() }
+
 
     override fun run() {
         if (input.hasNextLine()) {
-            playerName = input.nextLine()
-            println("Игрок $playerName подключился!")
+            userName = input.nextLine()
+            server.addClient(this)
+            println("Игрок $userName подключился!")
         }
 
         while (input.hasNextLine()) {

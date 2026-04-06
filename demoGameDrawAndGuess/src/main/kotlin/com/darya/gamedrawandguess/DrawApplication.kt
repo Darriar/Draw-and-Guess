@@ -7,7 +7,7 @@ import javafx.stage.Stage
 
 class DrawApplication : Application() {
     override fun start(stage: Stage) {
-        val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("draw-view.fxml"))
+        val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("welcome-view.fxml"))
         val scene = Scene(fxmlLoader.load())
         stage.title = "Draw && Guess!"
         stage.scene = scene
@@ -19,9 +19,9 @@ fun main() {
     Application.launch(DrawApplication::class.java)
 }
 
-// сделать чтобы при входе отображалось то что было нарисовано (?)
-// приветственное окно
+// сделать чтобы при входе отображалось то что было нарисовано (?) и весь чат до
 // заливку
 // фигуры линия квадрат круг
 // палитра цветов как квадратики слева несколько
-// в чате имя
+
+// ИГРОВОЙ ФУНКЦИОНАЛ

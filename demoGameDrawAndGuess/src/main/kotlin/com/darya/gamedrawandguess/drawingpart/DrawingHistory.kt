@@ -1,4 +1,6 @@
-package com.darya.gamedrawandguess
+package com.darya.gamedrawandguess.drawingpart
+
+import com.darya.gamedrawandguess.model.LineData
 
 object DrawingHistory: Iterable<LineData> {
     private val drawHistory = mutableListOf<LineData>()

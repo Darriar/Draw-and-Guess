@@ -1,4 +1,4 @@
-package com.darya.gamedrawandguess
+package com.darya.gamedrawandguess.model
 
 import javafx.scene.paint.Color
 
