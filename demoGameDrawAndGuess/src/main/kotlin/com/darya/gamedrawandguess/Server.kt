@@ -12,18 +12,40 @@ class Server {
     private var currentPainterIndex: Int = -1
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
-    private val ROUND_TIME_IN_SECONDS = 5
+    private val ROUND_TIME_IN_SECONDS = 20
+    private val MAX_NUMBER_OF_SCORES = 100
     private var isGameStarted = false
+    private val fileManager = FileManager
+    private var keyWord: String = ""
+    private var roundStartTime: Long = 0
+
 
     fun broadcast(message: String, sender: ClientHandler?) {
-        for (client in clients) {
+        if (!checkWord(message, sender))
+            for (client in clients)
                 client.sendMessage(message)
+
+    }
+
+    private fun checkWord(message: String, sender: ClientHandler?): Boolean {
+        if (message.startsWith("CHAT:")) {
+            val answer = message.substringAfter(":").substringAfter(":").trim()
+            if (answer.equals(keyWord, ignoreCase = true)) {
+                broadcast("CHAT:Ирок ${sender!!.userName} отгадал слово!", null)
+
+                val timePassedMillis = System.currentTimeMillis() - roundStartTime
+                val secondsPassed = (timePassedMillis / 1000).toInt()
+                sender.score += (((ROUND_TIME_IN_SECONDS - secondsPassed) / ROUND_TIME_IN_SECONDS.toDouble()) * MAX_NUMBER_OF_SCORES).toInt()
+                println("Количество очков ${sender.userName}: ${sender.score}")
+                return true
+            }
         }
+        return false
     }
 
     fun addClient(client: ClientHandler) {
         clients.add(client)
-
+        broadcast("ADD_CLIENT:${client.id},${client.userName},${client.score}", null)
         if (clients.size > 0 && !isGameStarted) {
             isGameStarted = true
             startRound()
@@ -32,24 +54,12 @@ class Server {
 
     fun removeClient(client: ClientHandler) {
         clients.remove(client)
-        broadcast("CHAT:Игрок ${client.userName} покинул игру.", null)
+        broadcast("REMOVE_CLIENT:${client.id},${client.userName}", null)
 
         if (client.isDrawing) {
-            broadcast("SYSTEM:Художник отключился. Начинаем новый раунд...", null)
+            broadcast("CHAT:Художник отключился. Начинаем новый раунд...", null)
             forceStopRound()
         }
-    }
-
-    private fun setPainter(): ClientHandler? {
-        if (clients.isEmpty()) return null
-
-        currentPainterIndex = (currentPainterIndex + 1) % clients.size
-        return clients[currentPainterIndex]
-    }
-
-    private fun giveRoot() {
-        clients.forEach { it.isDrawing = false }
-        currentPainter?.isDrawing = true
     }
 
     private fun startRound() {
@@ -62,24 +72,34 @@ class Server {
 
         currentPainter = setPainter()
         giveRoot()
+        keyWord = fileManager.getNextWord()
 
-        val fileManager = FileManager
-        val word = fileManager.getNextWord()
         broadcast("CLEAR", null)
-        currentPainter?.sendMessage("NEXT_WORD:$word")
+        clients.forEach { it.sendMessage("UPDATE_SCORE:${it.id},${it.score}") }
+        broadcast("SET_DEFAULT_MODE", null)
+        currentPainter?.sendMessage("SET_PAINTER_MODE")
+        currentPainter?.sendMessage("NEXT_WORD:$keyWord")
         broadcast("CURRENT_PAINTER:${currentPainter?.userName}", null)
         broadcast("ROUND_START:$ROUND_TIME_IN_SECONDS", null)
+        roundStartTime = System.currentTimeMillis()
 
-        /*scheduler.schedule({
-            stopRound()
-        }, ROUND_TIME_IN_SECONDS.toLong(), TimeUnit.SECONDS)*/
         currentRoundTask = scheduler.schedule({
             stopRound()
         }, ROUND_TIME_IN_SECONDS.toLong(), TimeUnit.SECONDS)
     }
 
-    fun forceStopRound() {
-        // true — прервать поток, если он занят (для простых задач ставим false)
+    private fun setPainter(): ClientHandler? {
+        if (clients.isEmpty()) return null
+        currentPainterIndex = (currentPainterIndex + 1) % clients.size
+        return clients[currentPainterIndex]
+    }
+
+    private fun giveRoot() {
+        clients.forEach { it.isDrawing = false }
+        currentPainter?.isDrawing = true
+    }
+
+    private fun forceStopRound() {
         val canceled = currentRoundTask?.cancel(false)
 
         if (canceled == true || currentRoundTask == null) {
@@ -90,10 +110,9 @@ class Server {
 
     private fun stopRound() {
         broadcast("ROUND_END", null)
-        println("Сервер: Время вышло, раунд окончен")
         scheduler.schedule({
             startRound()
-        }, 3, TimeUnit.SECONDS)
+        }, 3, TimeUnit.SECONDS) // жду 3 секунды перед след раундом
     }
 }
 

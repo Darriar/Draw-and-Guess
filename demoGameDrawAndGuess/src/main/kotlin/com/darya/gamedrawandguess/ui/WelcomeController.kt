@@ -19,7 +19,7 @@ class WelcomeController {
     @FXML
     fun onStartBtnClick() {
         val userName = inputNameText.text
-        if (userName.isNotEmpty()) {
+        if (userName.trim().isNotEmpty()) {
             val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("draw-view.fxml"))
             val mainRoot = fxmlLoader.load<Parent>()
 

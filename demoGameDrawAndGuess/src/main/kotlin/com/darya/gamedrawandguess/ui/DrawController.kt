@@ -14,7 +14,9 @@ import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
+import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
+import javafx.scene.layout.VBox
 import javafx.util.Duration
 import java.io.PrintWriter
 
@@ -37,12 +39,15 @@ class DrawController {
     private lateinit var wordLabel: Label
     @FXML
     private lateinit var statusLabel: Label
+    @FXML
+    private lateinit var leftVBox: VBox
 
     private lateinit var gc: GraphicsContext
     private lateinit var out: PrintWriter       // Этот объект создан при подключении к сокету
     private var userName: String = ""
     private var timeLine: Timeline? = null
     private lateinit var serverConnection: ToServer
+    private var playersInfo =  mutableMapOf<Int, Pair<HBox, Label>>()
 
     @FXML
     fun initialize() {
@@ -65,7 +70,7 @@ class DrawController {
         out.println(userName)
     }
 
-    fun setCurrentPainterName(name: String) {
+    fun setCurrentPainter(name: String) {
         statusLabel.text = "Рисует $name... Угадайте слово!"
     }
 
@@ -78,12 +83,33 @@ class DrawController {
         }
     }
 
+    // СОРТИРГОВАТЬ СВЕРХУ У КОГО БОЛЬШЕ ОЧКОВ
+    fun updatePlayersInfo() {
+        leftVBox.children.clear()
+        playersInfo.forEach { leftVBox.children.add(it.value.first) }
+    }
+
+    fun updatePlayerScore(id: Int, score: String) {
+        playersInfo[id]?.second!!.text = score  // МОЖЕТ ВООБЩЕ НИКОГДА NULL
+    }
+
+    fun createPlayerInfo(id: Int, userName: String, score: String) {
+        val nameLabel = Label("$userName:")
+        val scoreLabel = Label(score)
+
+        val row = HBox(10.0, nameLabel, scoreLabel) // 10.0 ФИКС СДЕЛАТЬ КОНСТАНТОЙ
+        playersInfo[id] = Pair(row, scoreLabel)
+        updatePlayersInfo()
+    }
+
+    fun removePlayerInfo(id: Int) {
+        playersInfo.remove(id)
+        updatePlayersInfo()
+    }
+
     @FXML
     fun clearCanvas() {
-        val width = gameCanvas.width
-        val height = gameCanvas.height
-
-        gc.clearRect(0.0, 0.0, width, height)
+        gc.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
         DrawingHistory.clear()
         out.println("CLEAR")
     }
@@ -113,5 +139,16 @@ class DrawController {
 
     fun updateWord(word: String) {
         wordLabel.text = word
+    }
+
+    fun setMode(isPainterMode: Boolean) {
+        if (isPainterMode) {
+            gameCanvas.disableProperty().set(false)
+            messageTextField.disableProperty().set(true)
+        }
+        else {
+            gameCanvas.disableProperty().set(true)
+            messageTextField.disableProperty().set(false)
+        }
     }
 }

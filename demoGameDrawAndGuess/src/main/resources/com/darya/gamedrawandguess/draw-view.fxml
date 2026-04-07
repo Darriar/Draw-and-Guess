@@ -13,14 +13,13 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.DrawController">
    <right>
-      <VBox BorderPane.alignment="CENTER">
+      <VBox fx:id="rightVBox" BorderPane.alignment="CENTER">
          <children>
             <ScrollPane prefHeight="470.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                <VBox.margin>
@@ -71,9 +70,6 @@
          </BorderPane.margin>
       </StackPane>
    </center>
-   <left>
-      <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-   </left>
    <top>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
@@ -99,4 +95,7 @@
          </children>
       </GridPane>
    </top>
+   <left>
+      <VBox fx:id="leftVBox" prefHeight="240.0" prefWidth="130.0" BorderPane.alignment="CENTER" />
+   </left>
 </BorderPane>
