@@ -1,6 +1,8 @@
 package com.darya.gamedrawandguess
 
+import com.darya.gamedrawandguess.model.LineData
 import com.darya.gamedrawandguess.util.FileManager
+import javafx.scene.paint.Color
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -12,19 +14,26 @@ class Server {
     private var currentPainterIndex: Int = -1
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
-    private val ROUND_TIME_IN_SECONDS = 20
+    private val ROUND_TIME_IN_SECONDS = 35
     private val MAX_NUMBER_OF_SCORES = 100
     private var isGameStarted = false
     private val fileManager = FileManager
     private var keyWord: String = ""
     private var roundStartTime: Long = 0
+    private var drawingHistory = mutableListOf<LineData>()
 
 
     fun broadcast(message: String, sender: ClientHandler?) {
+        if (message.startsWith("DRAW:")) {
+            val line = ToServer.parseStringToLineData(message.substringAfter(":"))
+            drawingHistory.add(line)
+        } else if (message == "CLEAR")
+            drawingHistory.clear()
+
+
         if (!checkWord(message, sender))
             for (client in clients)
                 client.sendMessage(message)
-
     }
 
     private fun checkWord(message: String, sender: ClientHandler?): Boolean {
@@ -46,6 +55,7 @@ class Server {
     fun addClient(client: ClientHandler) {
         clients.add(client)
         broadcast("ADD_CLIENT:${client.id},${client.userName},${client.score}", null)
+        drawingHistory.forEach { client.sendMessage("DRAW:${it.x1},${it.y1},${it.x2},${it.y2},${it.color},${it.size}") }
         if (clients.size > 0 && !isGameStarted) {
             isGameStarted = true
             startRound()
@@ -67,7 +77,7 @@ class Server {
             isGameStarted = false
             return
         }
-
+        drawingHistory.clear()
         currentRoundTask?.cancel(false)
 
         currentPainter = setPainter()

@@ -49,7 +49,7 @@
       </VBox>
    </right>
    <bottom>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <HBox fx:id="bottomHBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <ColorPicker fx:id="colorPicker" />
             <Slider fx:id="sizeSlider" />

@@ -1,8 +1,8 @@
 package com.darya.gamedrawandguess.ui
 
 import com.darya.gamedrawandguess.drawingpart.Drawing
-import com.darya.gamedrawandguess.drawingpart.DrawingHistory
 import com.darya.gamedrawandguess.ToServer
+import com.darya.gamedrawandguess.model.LineData
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.application.Platform
@@ -41,6 +41,8 @@ class DrawController {
     private lateinit var statusLabel: Label
     @FXML
     private lateinit var leftVBox: VBox
+    @FXML
+    private lateinit var bottomHBox: HBox
 
     private lateinit var gc: GraphicsContext
     private lateinit var out: PrintWriter       // Этот объект создан при подключении к сокету
@@ -48,10 +50,11 @@ class DrawController {
     private var timeLine: Timeline? = null
     private lateinit var serverConnection: ToServer
     private var playersInfo =  mutableMapOf<Int, Pair<HBox, Label>>()
+    private var drawingHistory = mutableListOf<LineData>()
 
     @FXML
     fun initialize() {
-        Init.initCanvas(gameCanvas, canvasContainer)
+        Init.initCanvas(gameCanvas, canvasContainer, drawingHistory)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
         gc = Init.initGraphicContext(gameCanvas, sizeSlider, colorPicker)
@@ -107,10 +110,17 @@ class DrawController {
         updatePlayersInfo()
     }
 
+    fun clearDrawingHistory() {
+        drawingHistory.clear()
+    }
+
+    fun addLineToDrawingHistory(line: LineData) {
+        drawingHistory.add(line)
+    }
+
     @FXML
     fun clearCanvas() {
         gc.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
-        DrawingHistory.clear()
         out.println("CLEAR")
     }
 
@@ -145,10 +155,13 @@ class DrawController {
         if (isPainterMode) {
             gameCanvas.disableProperty().set(false)
             messageTextField.disableProperty().set(true)
+            bottomHBox.disableProperty().set(true)
         }
         else {
             gameCanvas.disableProperty().set(true)
             messageTextField.disableProperty().set(false)
+            bottomHBox.visibleProperty().set(false)
+            wordLabel.text = "*****"
         }
     }
 }

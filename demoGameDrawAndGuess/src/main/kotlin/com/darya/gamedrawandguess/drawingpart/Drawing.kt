@@ -21,10 +21,10 @@ object Drawing {
             line.x2 * canvas.width, line.y2 * canvas.height)
     }
 
-    fun redraw(canvas: Canvas) {
+    fun redraw(canvas: Canvas, drawingHistory: MutableList<LineData>) {
         val gc = canvas.graphicsContext2D
         gc.clearRect(0.0, 0.0, canvas.width, canvas.height)
-        val drawingHistory = DrawingHistory
+
         for (line in drawingHistory)
             drawLineOnCanvas(line, canvas)
     }
@@ -40,11 +40,7 @@ object Drawing {
             val currentY = event.y / canvas.height
 
             val line = LineData(lastX, lastY, currentX, currentY, colorPicker.value, sizeSlider.value)
-            val drawingHistory = DrawingHistory
-            drawingHistory.add(line)        // МОЖНО DrawingHistory.add(line)
-
             drawLineOnCanvas(line, canvas)
-
             out.println("DRAW:$lastX,$lastY,${currentX},${currentY},${colorPicker.value},${sizeSlider.value}")
 
             lastX = currentX
