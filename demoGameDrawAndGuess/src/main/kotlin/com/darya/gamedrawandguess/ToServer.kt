@@ -58,7 +58,8 @@ class ToServer(private val controller: DrawController) {
                     chat.appendText("${message.substringAfter(":")}\n")
                 }
                 message.startsWith("DRAW:") -> {
-                    drawFromNetwork(message, gameCanvas)
+                    val line = parseStringToLineData(message.substringAfter(":"))
+                    drawFromNetwork(line, gameCanvas)
                 }
                 message == "CLEAR" -> {
                     gameCanvas.graphicsContext2D.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
@@ -79,6 +80,9 @@ class ToServer(private val controller: DrawController) {
                     val info = message.substringAfter(":").split(",") // client.id, client.userName, client.score
                     controller.createPlayerInfo(id = info[0].toInt(), userName =  info[1], score =  info[2])
                     chat.appendText("Игрок ${info[1]} присоединился к игре\n")
+
+                    DrawingHistory.forEach { drawFromNetwork(it, gameCanvas) }
+
                 }
                 message.startsWith("REMOVE_CLIENT:") -> {
                     val info = message.substringAfter(":").split(",") // client.id, client.userName
@@ -105,23 +109,23 @@ class ToServer(private val controller: DrawController) {
         }
     }
 
-    private fun drawFromNetwork(message: String, gameCanvas: Canvas) {
-        val data = message.substringAfter(":").split(",")
+    private fun parseStringToLineData(str: String): LineData {
+        val data = str.split(",")
         val lastX = data[0].toDouble(); val lastY = data[1].toDouble()
         val currentX = data[2].toDouble(); val currentY = data[3].toDouble()
         val color = Color.web(data[4])
         val size = data[5].toDouble()
 
+        return LineData(lastX, lastY, currentX, currentY, color, size)
+    }
+
+    private fun drawFromNetwork(line: LineData, gameCanvas: Canvas) {
         val gc = gameCanvas.graphicsContext2D
-        gc.stroke = color
-        gc.lineWidth = size
+        gc.stroke = line.color
+        gc.lineWidth = line.size
         gc.lineCap = StrokeLineCap.ROUND
 
-        gc.strokeLine(lastX * gameCanvas.width, lastY * gameCanvas.height,
-            currentX * gameCanvas.width, currentY * gameCanvas.height)
-
-        val drawingHistory = DrawingHistory
-        val line = LineData(lastX, lastY, currentX, currentY, color, size)
-        drawingHistory.add(line)
+        gc.strokeLine(line.x1 * gameCanvas.width, line.y1 * gameCanvas.height,
+            line.x2 * gameCanvas.width, line.y2 * gameCanvas.height)
     }
 }
