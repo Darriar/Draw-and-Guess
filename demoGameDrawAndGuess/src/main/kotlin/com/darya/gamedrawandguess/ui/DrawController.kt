@@ -155,7 +155,7 @@ class DrawController {
         if (isPainterMode) {
             gameCanvas.disableProperty().set(false)
             messageTextField.disableProperty().set(true)
-            bottomHBox.disableProperty().set(true)
+            bottomHBox.visibleProperty().set(true)
         }
         else {
             gameCanvas.disableProperty().set(true)

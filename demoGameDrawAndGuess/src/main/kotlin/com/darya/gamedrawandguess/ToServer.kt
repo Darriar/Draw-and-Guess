@@ -19,7 +19,7 @@ class ToServer(private val controller: DrawController) {
         try {
             val localhost = InetAddress.getLocalHost().hostAddress
             println(localhost)
-            socket = Socket("localhost", 8080)     // 10.177.142.105
+            socket = Socket("localhost", 8080)     // 10.177.142.105    192.168.100.11
             startListening(chat, gameCanvas)
             chat.appendText("Система: Вы подключены к серверу!\n")
             return socket
@@ -80,7 +80,7 @@ class ToServer(private val controller: DrawController) {
                 message.startsWith("ADD_CLIENT:") -> {
                     val info = message.substringAfter(":").split(",") // client.id, client.userName, client.score
                     controller.createPlayerInfo(id = info[0].toInt(), userName =  info[1], score =  info[2])
-                    chat.appendText("Игрок ${info[1]} присоединился к игре\n")
+                    //chat.appendText("Игрок ${info[1]} присоединился к игре\n")
                 }
                 message.startsWith("REMOVE_CLIENT:") -> {
                     val info = message.substringAfter(":").split(",") // client.id, client.userName

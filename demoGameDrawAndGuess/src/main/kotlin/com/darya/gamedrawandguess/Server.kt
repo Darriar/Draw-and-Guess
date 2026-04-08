@@ -2,7 +2,6 @@ package com.darya.gamedrawandguess
 
 import com.darya.gamedrawandguess.model.LineData
 import com.darya.gamedrawandguess.util.FileManager
-import javafx.scene.paint.Color
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -17,6 +16,7 @@ class Server {
     private val ROUND_TIME_IN_SECONDS = 35
     private val MAX_NUMBER_OF_SCORES = 100
     private var isGameStarted = false
+    private var isRoundStarted = false
     private val fileManager = FileManager
     private var keyWord: String = ""
     private var roundStartTime: Long = 0
@@ -37,7 +37,7 @@ class Server {
     }
 
     private fun checkWord(message: String, sender: ClientHandler?): Boolean {
-        if (message.startsWith("CHAT:")) {
+        if (isRoundStarted && message.startsWith("CHAT:")) {
             val answer = message.substringAfter(":").substringAfter(":").trim()
             if (answer.equals(keyWord, ignoreCase = true)) {
                 broadcast("CHAT:Ирок ${sender!!.userName} отгадал слово!", null)
@@ -56,10 +56,16 @@ class Server {
         clients.add(client)
         broadcast("ADD_CLIENT:${client.id},${client.userName},${client.score}", null)
         drawingHistory.forEach { client.sendMessage("DRAW:${it.x1},${it.y1},${it.x2},${it.y2},${it.color},${it.size}") }
+        client.sendMessage("SET_DEFAULT_MODE")
         if (clients.size > 0 && !isGameStarted) {
             isGameStarted = true
             startRound()
         }
+        broadcast("CURRENT_PAINTER:${currentPainter?.userName}", null)
+        val leftTime = ROUND_TIME_IN_SECONDS - roundStartTime / 1000
+        client.sendMessage("ROUND_START:$leftTime")
+        clients.forEach {  client.sendMessage("ADD_CLIENT:${it.id},${it.userName},${it.score}")}
+        ("CHAT:Игрок ${client.userName} присоединился к игре\n")
     }
 
     fun removeClient(client: ClientHandler) {
@@ -70,6 +76,18 @@ class Server {
             broadcast("CHAT:Художник отключился. Начинаем новый раунд...", null)
             forceStopRound()
         }
+        broadcast("CURRENT_PAINTER:${currentPainter?.userName}", null)
+    }
+
+    private fun setPainter(): ClientHandler? {
+        if (clients.isEmpty()) return null
+        currentPainterIndex = (currentPainterIndex + 1) % clients.size
+        return clients[currentPainterIndex]
+    }
+
+    private fun giveRoot() {
+        clients.forEach { it.isDrawing = false }
+        currentPainter?.isDrawing = true
     }
 
     private fun startRound() {
@@ -85,28 +103,18 @@ class Server {
         keyWord = fileManager.getNextWord()
 
         broadcast("CLEAR", null)
-        clients.forEach { it.sendMessage("UPDATE_SCORE:${it.id},${it.score}") }
+        clients.forEach { broadcast("UPDATE_SCORE:${it.id},${it.score}", null) }
         broadcast("SET_DEFAULT_MODE", null)
         currentPainter?.sendMessage("SET_PAINTER_MODE")
         currentPainter?.sendMessage("NEXT_WORD:$keyWord")
         broadcast("CURRENT_PAINTER:${currentPainter?.userName}", null)
         broadcast("ROUND_START:$ROUND_TIME_IN_SECONDS", null)
         roundStartTime = System.currentTimeMillis()
+        isRoundStarted = false
 
         currentRoundTask = scheduler.schedule({
             stopRound()
         }, ROUND_TIME_IN_SECONDS.toLong(), TimeUnit.SECONDS)
-    }
-
-    private fun setPainter(): ClientHandler? {
-        if (clients.isEmpty()) return null
-        currentPainterIndex = (currentPainterIndex + 1) % clients.size
-        return clients[currentPainterIndex]
-    }
-
-    private fun giveRoot() {
-        clients.forEach { it.isDrawing = false }
-        currentPainter?.isDrawing = true
     }
 
     private fun forceStopRound() {
@@ -120,6 +128,7 @@ class Server {
 
     private fun stopRound() {
         broadcast("ROUND_END", null)
+        isRoundStarted = false
         scheduler.schedule({
             startRound()
         }, 3, TimeUnit.SECONDS) // жду 3 секунды перед след раундом
