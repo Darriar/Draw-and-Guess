@@ -4,6 +4,7 @@ import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
 import javafx.stage.Stage
+import kotlin.system.exitProcess
 
 class DrawApplication : Application() {
     override fun start(stage: Stage) {
@@ -12,6 +13,10 @@ class DrawApplication : Application() {
         stage.title = "Draw && Guess!"
         stage.scene = scene
         stage.show()
+    }
+
+    override fun stop() {
+        exitProcess(0)
     }
 }
 
@@ -24,5 +29,4 @@ fun main() {
 // фигуры линия квадрат круг
 // палитра цветов как квадратики слева несколько
 
-// когда раунд закончился пользователь может угадать слово
-// когда подключился второй то много не апдейтнулось (таймер)
+// всплывающее окно с тем какое было слово

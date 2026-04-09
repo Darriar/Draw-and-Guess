@@ -1,7 +1,7 @@
 package com.darya.gamedrawandguess.ui
 
 import com.darya.gamedrawandguess.drawingpart.Drawing
-import com.darya.gamedrawandguess.model.LineData
+import com.darya.gamedrawandguess.model.GameEvent
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ColorPicker
@@ -13,7 +13,7 @@ import javafx.scene.shape.StrokeLineCap
 
 
 object Init {
-    fun initCanvas(canvas: Canvas, canvasContainer: StackPane, drawingHistory: MutableList<LineData>) {
+    fun initCanvas(canvas: Canvas, canvasContainer: StackPane, drawingHistory: MutableList<GameEvent.Draw>) {
         canvas.widthProperty().bind(canvasContainer.widthProperty())
         canvas.heightProperty().bind(canvasContainer.heightProperty())
 

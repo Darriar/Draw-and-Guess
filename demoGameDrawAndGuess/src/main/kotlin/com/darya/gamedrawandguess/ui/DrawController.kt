@@ -2,10 +2,9 @@ package com.darya.gamedrawandguess.ui
 
 import com.darya.gamedrawandguess.drawingpart.Drawing
 import com.darya.gamedrawandguess.ToServer
-import com.darya.gamedrawandguess.model.LineData
+import com.darya.gamedrawandguess.model.GameEvent
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
-import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -18,6 +17,8 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.util.Duration
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.PrintWriter
 
 class DrawController {
@@ -45,12 +46,12 @@ class DrawController {
     private lateinit var bottomHBox: HBox
 
     private lateinit var gc: GraphicsContext
-    private lateinit var out: PrintWriter       // Этот объект создан при подключении к сокету
+    private lateinit var out: PrintWriter
     private var userName: String = ""
     private var timeLine: Timeline? = null
     private lateinit var serverConnection: ToServer
     private var playersInfo =  mutableMapOf<Int, Pair<HBox, Label>>()
-    private var drawingHistory = mutableListOf<LineData>()
+    private var drawingHistory = mutableListOf<GameEvent.Draw>()
 
     @FXML
     fun initialize() {
@@ -81,7 +82,9 @@ class DrawController {
     fun onSendBtnClick() {
         val text =messageTextField.text
         if (text.isNotEmpty()) {
-            out.println("CHAT:$userName: $text")
+            val message: GameEvent = GameEvent.Chat(userName = this.userName, message = text)
+            val jsonMessage = Json.encodeToString(message)
+            out.println(jsonMessage)
             messageTextField.clear()
         }
     }
@@ -89,11 +92,12 @@ class DrawController {
     // СОРТИРГОВАТЬ СВЕРХУ У КОГО БОЛЬШЕ ОЧКОВ
     fun updatePlayersInfo() {
         leftVBox.children.clear()
-        playersInfo.forEach { leftVBox.children.add(it.value.first) }
+        val sortedList = playersInfo.toList().sortedBy { it.second.second.text.toInt() }
+        sortedList.forEach { leftVBox.children.add(it.second.first) }
     }
 
     fun updatePlayerScore(id: Int, score: String) {
-        playersInfo[id]?.second!!.text = score  // МОЖЕТ ВООБЩЕ НИКОГДА NULL
+        playersInfo[id]!!.second.text = score
     }
 
     fun createPlayerInfo(id: Int, userName: String, score: String) {
@@ -114,25 +118,26 @@ class DrawController {
         drawingHistory.clear()
     }
 
-    fun addLineToDrawingHistory(line: LineData) {
+    fun addLineToDrawingHistory(line: GameEvent.Draw) {
         drawingHistory.add(line)
     }
 
     @FXML
     fun clearCanvas() {
-        gc.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
-        out.println("CLEAR")
+        val event = GameEvent.Clear
+        val jsonMessage = Json.encodeToString<GameEvent>(event)
+        out.println(jsonMessage)
+        gameCanvas.graphicsContext2D.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
     }
 
     fun updateTimer(seconds: Int) {
-        timeLine?.stop()        //  зачем останавливать старый
+        timeLine?.stop()
 
         var timeLeft = seconds
         timeLine = Timeline(KeyFrame(Duration.seconds(1.0), {
             timeLeft--
-            Platform.runLater {
-                timerLabel.text = "Осталось: $timeLeft"
-            }
+            timerLabel.text = "Осталось: $timeLeft"
+
             if (timeLeft <= 0)  timeLine?.stop()
         }))
 
@@ -141,20 +146,18 @@ class DrawController {
     }
 
     fun stopTimer() {
-        Platform.runLater {
-            timeLine?.stop()
-            timerLabel.text = "Время вышло!"
-        }
+        timeLine?.stop()
+        timerLabel.text = "Время вышло!"
     }
 
     fun updateWord(word: String) {
         wordLabel.text = word
     }
 
-    fun setMode(isPainterMode: Boolean) {
+    fun setDrawingMode(isPainterMode: Boolean) {
         if (isPainterMode) {
             gameCanvas.disableProperty().set(false)
-            messageTextField.disableProperty().set(true)
+           // messageTextField.disableProperty().set(true)
             bottomHBox.visibleProperty().set(true)
         }
         else {
@@ -164,4 +167,6 @@ class DrawController {
             wordLabel.text = "*****"
         }
     }
+
+
 }
