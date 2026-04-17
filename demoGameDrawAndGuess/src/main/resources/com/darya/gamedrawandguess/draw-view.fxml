@@ -4,6 +4,7 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
@@ -51,6 +52,7 @@
    <bottom>
       <HBox fx:id="bottomHBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
+            <ComboBox fx:id="shapeComboBox" prefWidth="150.0" />
             <ColorPicker fx:id="colorPicker" />
             <Slider fx:id="sizeSlider" />
             <Button fx:id="clearBtn" mnemonicParsing="false" onAction="#clearCanvas" text="Очистить" />
@@ -64,6 +66,8 @@
       <StackPane fx:id="canvasContainer" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <Canvas fx:id="gameCanvas" height="200.0" width="200.0" />
+            <Canvas fx:id="tempCanvas" height="200.0" width="200.0" />
+
          </children>
          <BorderPane.margin>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

@@ -2,9 +2,11 @@ package com.darya.gamedrawandguess.ui
 
 import com.darya.gamedrawandguess.drawingpart.Drawing
 import com.darya.gamedrawandguess.model.GameEvent
+import com.darya.gamedrawandguess.model.ShapeType
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ColorPicker
+import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
@@ -13,12 +15,16 @@ import javafx.scene.shape.StrokeLineCap
 
 
 object Init {
-    fun initCanvas(canvas: Canvas, canvasContainer: StackPane, drawingHistory: MutableList<GameEvent.Draw>) {
+    fun initCanvas(canvas: Canvas, canvasContainer: StackPane, drawingHistory: MutableList<GameEvent>) {
         canvas.widthProperty().bind(canvasContainer.widthProperty())
         canvas.heightProperty().bind(canvasContainer.heightProperty())
 
         canvasContainer.minWidth = 0.0
         canvasContainer.minHeight = 0.0
+
+        canvas.graphicsContext2D.fill = Color.WHITE
+        canvas.graphicsContext2D.fillRect(0.0, 0.0, canvas.width, canvas.height)
+        println("${canvas.width}, ${canvas.height}")
 
         canvas.widthProperty().addListener { _ -> Drawing.redraw(canvas, drawingHistory) }
         canvas.heightProperty().addListener { _ -> Drawing.redraw(canvas, drawingHistory) }
@@ -46,6 +52,12 @@ object Init {
         gc.lineCap = StrokeLineCap.ROUND
 
         return gc
+    }
+
+    fun initComboBox(comboBox: ComboBox<ShapeType>) {
+        comboBox.items.addAll(ShapeType.entries.toTypedArray())
+
+        comboBox.selectionModel.select(ShapeType.FREEHAND)
     }
 
 }

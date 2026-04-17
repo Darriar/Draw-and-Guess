@@ -1,19 +1,19 @@
 package com.darya.gamedrawandguess
 
+import com.darya.gamedrawandguess.drawingpart.Drawing
 import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.ui.DrawController
 import javafx.application.Platform
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.TextArea
-import javafx.scene.paint.Color
-import javafx.scene.shape.StrokeLineCap
 import kotlinx.serialization.json.Json
 import kotlin.reflect.KClass
 
 
 class ProcessEvent(private val controller: DrawController,
                    private val chat: TextArea,
-                   private val gameCanvas: Canvas) {
+                   private val gameCanvas: Canvas,
+                   private val tempCanvas: Canvas) {
 
     private val events = mutableMapOf<KClass<out GameEvent>, (GameEvent) -> Unit>()
 
@@ -22,10 +22,15 @@ class ProcessEvent(private val controller: DrawController,
     }
 
     private fun setUpEventsMap() {
-        events[GameEvent.Draw::class] = {event ->
-            val drawEvent = event as GameEvent.Draw
-            drawFromNetwork(drawEvent, gameCanvas)
-            controller.addLineToDrawingHistory(drawEvent)
+        events[GameEvent.DrawShape::class] = { event ->
+            val drawEvent = event as GameEvent.DrawShape
+            tempCanvas.graphicsContext2D.clearRect(0.0, 0.0, tempCanvas.width, tempCanvas.height)
+            if (drawEvent.isPreview) {
+                Drawing.drawShape(drawEvent, tempCanvas)
+            } else {
+                Drawing.drawShape(drawEvent, gameCanvas)
+                controller.addLineToDrawingHistory(drawEvent)
+            }
         }
 
         events[GameEvent.Chat::class] = { event ->
@@ -34,7 +39,7 @@ class ProcessEvent(private val controller: DrawController,
         }
 
         events[GameEvent.Clear::class] = {
-            gameCanvas.graphicsContext2D.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
+            Drawing.clearCanvasToWhite(gameCanvas)
             controller.clearDrawingHistory()
         }
 
@@ -51,19 +56,16 @@ class ProcessEvent(private val controller: DrawController,
             }
         }
 
-        events[GameEvent.RoundEnd::class] = {
+        events[GameEvent.RoundEnd::class] = {event ->
+            val word = event as GameEvent.RoundEnd
+            controller.updateWord(word.keyWord)
+            controller.blockCanvas()
             controller.stopTimer()
-            controller.updatePlayersInfo()
         }
 
         events[GameEvent.UpdateScore::class] = { event ->
             val scoreData = event as GameEvent.UpdateScore
             controller.updatePlayerScore(scoreData.id, scoreData.score.toString())  // испр стринг
-        }
-
-        events[GameEvent.NextWord::class] = { event ->
-            val nextWord = event as GameEvent.NextWord
-            controller.updateWord(nextWord.word)
         }
 
         events[GameEvent.AddClient::class] = { event ->
@@ -89,16 +91,4 @@ class ProcessEvent(private val controller: DrawController,
             println("Ошибка парсинга JSON: ${e.message}")
         }
     }
-
-    private fun drawFromNetwork(line: GameEvent.Draw, gameCanvas: Canvas) {
-        val gc = gameCanvas.graphicsContext2D
-        gc.stroke = Color.web(line.color)
-        gc.lineWidth = line.size
-        gc.lineCap = StrokeLineCap.ROUND
-
-        gc.strokeLine(line.x1 * gameCanvas.width, line.y1 * gameCanvas.height,
-            line.x2 * gameCanvas.width, line.y2 * gameCanvas.height)
-    }
-
-
 }

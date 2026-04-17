@@ -3,12 +3,14 @@ package com.darya.gamedrawandguess.ui
 import com.darya.gamedrawandguess.drawingpart.Drawing
 import com.darya.gamedrawandguess.ToServer
 import com.darya.gamedrawandguess.model.GameEvent
+import com.darya.gamedrawandguess.model.ShapeType
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.fxml.FXML
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ColorPicker
+import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.TextArea
@@ -24,6 +26,8 @@ import java.io.PrintWriter
 class DrawController {
     @FXML
     private lateinit var gameCanvas: Canvas
+    @FXML
+    private lateinit var tempCanvas: Canvas
     @FXML
     private lateinit var canvasContainer: StackPane
     @FXML
@@ -44,6 +48,8 @@ class DrawController {
     private lateinit var leftVBox: VBox
     @FXML
     private lateinit var bottomHBox: HBox
+    @FXML
+    private lateinit var shapeComboBox: ComboBox<ShapeType>
 
     private lateinit var gc: GraphicsContext
     private lateinit var out: PrintWriter
@@ -51,21 +57,22 @@ class DrawController {
     private var timeLine: Timeline? = null
     private lateinit var serverConnection: ToServer
     private var playersInfo =  mutableMapOf<Int, Pair<HBox, Label>>()
-    private var drawingHistory = mutableListOf<GameEvent.Draw>()
+    private var drawingHistory = mutableListOf<GameEvent>()
 
     @FXML
     fun initialize() {
         Init.initCanvas(gameCanvas, canvasContainer, drawingHistory)
+        Init.initCanvas(tempCanvas, canvasContainer, drawingHistory)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
+        Init.initComboBox(shapeComboBox)
         gc = Init.initGraphicContext(gameCanvas, sizeSlider, colorPicker)
 
         serverConnection = ToServer(this)
-        val socket = serverConnection.connect(chatTextArea, gameCanvas)
+        val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas)
         if (socket != null) {
             out = PrintWriter(socket.getOutputStream(), true)     // МОЖЕТ БЫТЬ NULL
-
-            Drawing.setupDrawingEvents(gameCanvas, colorPicker, sizeSlider, out)
+            Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, shapeComboBox, out)
         }
     }
 
@@ -90,7 +97,7 @@ class DrawController {
     }
 
     // СОРТИРГОВАТЬ СВЕРХУ У КОГО БОЛЬШЕ ОЧКОВ
-    fun updatePlayersInfo() {
+    private fun updatePlayersInfo() {
         leftVBox.children.clear()
         val sortedList = playersInfo.toList().sortedBy { it.second.second.text.toInt() }
         sortedList.forEach { leftVBox.children.add(it.second.first) }
@@ -118,7 +125,7 @@ class DrawController {
         drawingHistory.clear()
     }
 
-    fun addLineToDrawingHistory(line: GameEvent.Draw) {
+    fun addLineToDrawingHistory(line: GameEvent.DrawShape) {
         drawingHistory.add(line)
     }
 
@@ -127,7 +134,7 @@ class DrawController {
         val event = GameEvent.Clear
         val jsonMessage = Json.encodeToString<GameEvent>(event)
         out.println(jsonMessage)
-        gameCanvas.graphicsContext2D.clearRect(0.0, 0.0, gameCanvas.width, gameCanvas.height)
+        Drawing.clearCanvasToWhite(gameCanvas)
     }
 
     fun updateTimer(seconds: Int) {
@@ -154,14 +161,19 @@ class DrawController {
         wordLabel.text = word
     }
 
+    fun blockCanvas() {
+        tempCanvas.disableProperty().set(true)
+    }
+
     fun setDrawingMode(isPainterMode: Boolean) {
         if (isPainterMode) {
-            gameCanvas.disableProperty().set(false)
-           // messageTextField.disableProperty().set(true)
+           // gameCanvas.disableProperty().set(false)
+            tempCanvas.disableProperty().set(false)
+            messageTextField.disableProperty().set(true)
             bottomHBox.visibleProperty().set(true)
         }
         else {
-            gameCanvas.disableProperty().set(true)
+            tempCanvas.disableProperty().set(true)
             messageTextField.disableProperty().set(false)
             bottomHBox.visibleProperty().set(false)
             wordLabel.text = "*****"

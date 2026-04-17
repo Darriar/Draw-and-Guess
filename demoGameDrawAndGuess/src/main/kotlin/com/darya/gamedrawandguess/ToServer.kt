@@ -13,12 +13,12 @@ class ToServer(private val controller: DrawController) {
     private var socket: Socket? = null
 
 
-    fun connect(chat: TextArea, gameCanvas: Canvas): Socket? {
+    fun connect(chat: TextArea, gameCanvas: Canvas, tempCanvas: Canvas): Socket? {
         try {
             val localhost = InetAddress.getLocalHost().hostAddress
             println(localhost)
             socket = Socket("localhost", 8080)     // 10.177.142.105    192.168.100.11
-            startListening(chat, gameCanvas)
+            startListening(chat, gameCanvas, tempCanvas)
             chat.appendText("Система: Вы подключены к серверу!\n")
             return socket
         } catch (e: Exception) {
@@ -27,10 +27,10 @@ class ToServer(private val controller: DrawController) {
         }
     }
 
-    private fun startListening(chat: TextArea, gameCanvas: Canvas) {
+    private fun startListening(chat: TextArea, gameCanvas: Canvas, tempCanvas: Canvas) {
         val currentSocket = socket ?: return
         val input = Scanner(currentSocket.getInputStream())
-        val eventHandler = ProcessEvent(controller, chat, gameCanvas)
+        val eventHandler = ProcessEvent(controller, chat, gameCanvas, tempCanvas)
 
         Thread {
             try {
