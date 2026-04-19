@@ -7,6 +7,7 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ColorPicker
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
+import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.scene.shape.StrokeLineCap
 import kotlinx.serialization.encodeToString
@@ -18,7 +19,7 @@ import kotlin.math.abs
 object Drawing {
 
     fun redraw(canvas: Canvas, drawingHistory: MutableList<GameEvent>) {
-        clearCanvasToWhite(canvas)
+        clearGameCanvasToWhite(canvas)
         for (shape in drawingHistory)
             drawShape(shape as GameEvent.DrawShape, canvas)
     }
@@ -27,53 +28,55 @@ object Drawing {
         var startX = 0.0
         var startY = 0.0
 
+        fun createShape(event: MouseEvent) {
+            val shapeType = shapeComboBox.value
+            if (shapeType.isFloodFill) return
+
+            clearTempCanvas(tempCanvas)
+            val currentX = event.x / tempCanvas.width
+            val currentY = event.y / tempCanvas.height
+
+            val color = if (shapeType == ShapeType.ERASER) Color.WHITE else colorPicker.value
+            val isPreview = !(shapeType.isHandleDrawing || event.eventType == MouseEvent.MOUSE_RELEASED)
+            val canvas = if (isPreview) tempCanvas else gameCanvas
+
+            val shape = GameEvent.DrawShape(shapeType, startX, startY, currentX, currentY, color.toString(), sizeSlider.value, isPreview)
+
+            val jsonMessage = Json.encodeToString<GameEvent>(shape)
+            out.println(jsonMessage)
+
+            if (shapeType.isHandleDrawing) {
+                startX = currentX
+                startY = currentY
+            }
+
+            drawShape(shape, canvas)
+        }
+
         tempCanvas.setOnMousePressed { event ->
             startX = event.x / tempCanvas.width
             startY = event.y / tempCanvas.height
 
-            if (shapeComboBox.value == ShapeType.FLOODFILL) {
-                val fillEvent = GameEvent.DrawShape(
+            if (shapeComboBox.value.isFloodFill) {
+                val fillShape = GameEvent.DrawShape(
                     ShapeType.FLOODFILL, startX, startY, startX, startY,
                     colorPicker.value.toString(), sizeSlider.value, false
                 )
-                drawShape(fillEvent, gameCanvas)
-                out.println(Json.encodeToString<GameEvent>(fillEvent))
+                drawShape(fillShape, gameCanvas)
+                out.println(Json.encodeToString<GameEvent>(fillShape))
             }
         }
 
         tempCanvas.setOnMouseDragged { event ->
-            tempCanvas.graphicsContext2D.clearRect(0.0, 0.0, tempCanvas.width, tempCanvas.height)
-            val currentX = event.x / gameCanvas.width
-            val currentY = event.y / gameCanvas.height
-
-            val shape = shapeComboBox.value
-
-            val isPreview = !(shape == ShapeType.FREEHAND || shape == ShapeType.ERASER)
-            val color = if (shape == ShapeType.ERASER) Color.WHITE.toString() else colorPicker.value.toString()
-            val preview = GameEvent.DrawShape(shape, startX, startY, currentX, currentY, color, sizeSlider.value,  isPreview)
-
-            val jsonMessage = Json.encodeToString<GameEvent>(preview)
-            out.println(jsonMessage)
-
-            if (shape == ShapeType.FREEHAND || shape == ShapeType.ERASER) {
-                drawShape(preview, gameCanvas)
-                startX = currentX
-                startY = currentY
-            } else {
-                drawShape(preview, tempCanvas)
-            }
+            if (tempCanvas.isDisable) return@setOnMouseDragged
+            createShape(event)
         }
 
         tempCanvas.setOnMouseReleased { event ->
-            tempCanvas.graphicsContext2D.clearRect(0.0, 0.0, tempCanvas.width, tempCanvas.height)
-            val endX = event.x / gameCanvas.width
-            val endY = event.y / gameCanvas.height
-            val color = if (shapeComboBox.value == ShapeType.ERASER) Color.WHITE.toString() else colorPicker.value.toString()
-            val finalShape = GameEvent.DrawShape(shapeComboBox.value, startX, startY, endX, endY, color, sizeSlider.value, false)
-            val jsonMessage = Json.encodeToString<GameEvent>(finalShape)
-            out.println(jsonMessage)
-            drawShape(finalShape, gameCanvas)
+            if (tempCanvas.isDisable) return@setOnMouseReleased
+            createShape(event)
         }
+
     }
 
     fun drawShape(shape: GameEvent.DrawShape, canvas: Canvas) {
@@ -84,7 +87,6 @@ object Drawing {
         val x2 = shape.x2 * canvas.width
         val y2 = shape.y2 * canvas.height
 
-
         when (shape.shapeType) {
             ShapeType.OVAL, ShapeType.RECT -> {
                 val x = minOf(x1, x2)
@@ -92,11 +94,11 @@ object Drawing {
                 val w = abs(x1 - x2)
                 val h = abs(y1 - y2)
 
-                if (shape.shapeType == ShapeType.OVAL) {
+                if (shape.shapeType == ShapeType.OVAL)
                     gc.strokeOval(x, y, w, h)
-                } else {
+                else
                     gc.strokeRect(x, y, w, h)
-                }
+
             }
             ShapeType.LINE, ShapeType.FREEHAND, ShapeType.ERASER -> {
                 gc.strokeLine(x1, y1, x2, y2)
@@ -128,7 +130,7 @@ object Drawing {
             val (x, y) = points.removeFirst()
 
             if (x < 0 || x >= width || y < 0 || y >= height) continue
-            if (visitedPoints[x][y] || reader.getColor(x, y) == fillColor) continue
+            if (visitedPoints[x][y] || reader.getColor(x, y) != targetColor) continue
 
             writer.setColor(x, y, fillColor)
             visitedPoints[x][y] = true
@@ -150,9 +152,14 @@ object Drawing {
         }
     }
 
-    fun clearCanvasToWhite(canvas: Canvas) {
+    fun clearGameCanvasToWhite(canvas: Canvas) {
         val gc = canvas.graphicsContext2D
         gc.fill = Color.WHITE
         gc.fillRect(0.0, 0.0, canvas.width, canvas.height)
     }
+
+    fun clearTempCanvas(canvas: Canvas) {
+        canvas.graphicsContext2D.clearRect(0.0, 0.0, canvas.width, canvas.height)
+    }
+
 }

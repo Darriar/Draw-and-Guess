@@ -9,34 +9,41 @@ import java.util.concurrent.TimeUnit
 
 class Server {
     private val clients = CopyOnWriteArrayList<ClientHandler>()
-    private var currentPainter: ClientHandler? = null
+
+    @Volatile private var currentPainter: ClientHandler? = null
     private var currentPainterIndex: Int = -1
+
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
-    private val ROUND_TIME_IN_SECONDS = 20
+
+    private val ROUND_TIME_IN_SECONDS = 10
     private val MAX_NUMBER_OF_SCORES = 100
-    private var isGameStarted = false
-    private var isRoundStarted = false
+
+    @Volatile private var isGameStarted = false
+    @Volatile private var isRoundStarted = false
+
     private val fileManager = FileManager
     private var keyWord: String = ""
     private var roundStartTime: Long = 0
-    private var drawingHistory = mutableListOf<GameEvent>()
 
+    private val drawingHistory = CopyOnWriteArrayList<GameEvent>()
 
-    private fun broadcast(event: GameEvent) {
+    @Synchronized
+    private fun broadcast(event: GameEvent, sender: ClientHandler? = null) {
         when (event) {
-            is GameEvent.DrawShape -> {
-                if (!event.isPreview)
-                    drawingHistory.add(event)
-            }
+            is GameEvent.DrawShape -> { if (!event.isPreview) drawingHistory.add(event) }
             is GameEvent.Clear -> drawingHistory.clear()
             else -> {}
         }
 
-        for (client in clients)
-            client.sendEvent(event)
+        clients.forEach { client ->
+            if (!(client == sender && event !is GameEvent.Chat))    // рисование отправлять или нет
+                client.sendEvent(event)
+        }
+
     }
 
+    @Synchronized
     fun handleIncomingEvent(event: GameEvent, sender: ClientHandler) {
         if (isRoundStarted && event is GameEvent.Chat && !sender.isGuess && event.message.trim().equals(keyWord, ignoreCase = true)) {
             val timePassed = (System.currentTimeMillis() - roundStartTime) / 1000
@@ -45,32 +52,34 @@ class Server {
             broadcast(GameEvent.Chat("","Игрок ${sender.userName} отгадал слово!"))
             broadcast(GameEvent.UpdateScore(sender.id, sender.score))
             sender.isGuess = true
+
+            val guessers = clients.count { it.isGuess }
+            if (guessers >= clients.size - 1 && clients.size > 1) {
+                forceStopRound()
+            }
             return
         }
-
         broadcast(event)
     }
 
+    @Synchronized
     fun addClient(client: ClientHandler) {
-        clients.add(client)
-
-        broadcast(GameEvent.AddClient(client.id, client.userName, client.score))
-
         drawingHistory.forEach { client.sendEvent(it) }
+        clients.forEach { client.sendEvent(GameEvent.AddClient(it.id, it.userName, it.score)) }
 
-        clients.forEach {
-            client.sendEvent(GameEvent.AddClient(it.id, it.userName, it.score))
-        }
+        clients.add(client)
+        broadcast(GameEvent.AddClient(client.id, client.userName, client.score))
 
         if (clients.size > 0 && !isGameStarted) {
             isGameStarted = true
             startRound()
         } else {
             val leftTime = (ROUND_TIME_IN_SECONDS - (System.currentTimeMillis() - roundStartTime) / 1000).toInt()
-            client.sendEvent(GameEvent.RoundStart(currentPainter?.userName ?: "", leftTime, null))
+            client.sendEvent(GameEvent.RoundStart(currentPainter!!.userName, leftTime, null))
         }
     }
 
+    @Synchronized
     fun removeClient(client: ClientHandler) {
         clients.remove(client)
         broadcast(GameEvent.RemoveClient(client.id, client.userName))
@@ -92,8 +101,9 @@ class Server {
             isGameStarted = false
             return
         }
-        drawingHistory.clear()
+        //drawingHistory.clear()
         currentRoundTask?.cancel(false)
+
         currentPainter = setPainter()
         keyWord = fileManager.getNextWord()
         isRoundStarted = true   // было false и все работало
@@ -104,12 +114,9 @@ class Server {
             client.isGuess = false
             val word = if (client == currentPainter) keyWord else null
             client.sendEvent(GameEvent.RoundStart(currentPainter?.userName ?: "", ROUND_TIME_IN_SECONDS, word))
-            broadcast(GameEvent.UpdateScore(client.id, client.score))
         }
 
-        currentRoundTask = scheduler.schedule({
-            stopRound()
-        }, ROUND_TIME_IN_SECONDS.toLong(), TimeUnit.SECONDS)
+        currentRoundTask = scheduler.schedule({ stopRound() }, ROUND_TIME_IN_SECONDS.toLong(), TimeUnit.SECONDS)
     }
 
     private fun forceStopRound() {
@@ -124,9 +131,7 @@ class Server {
     private fun stopRound() {
         broadcast(GameEvent.RoundEnd(keyWord))
         isRoundStarted = false
-        scheduler.schedule({
-            startRound()
-        }, 3, TimeUnit.SECONDS) // жду 3 секунды перед след раундом
+        scheduler.schedule({ startRound() }, 3, TimeUnit.SECONDS)
     }
 }
 

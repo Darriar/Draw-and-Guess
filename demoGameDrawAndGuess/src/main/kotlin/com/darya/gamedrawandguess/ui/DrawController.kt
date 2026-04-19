@@ -3,9 +3,12 @@ package com.darya.gamedrawandguess.ui
 import com.darya.gamedrawandguess.drawingpart.Drawing
 import com.darya.gamedrawandguess.ToServer
 import com.darya.gamedrawandguess.model.GameEvent
+import com.darya.gamedrawandguess.model.PlayerInfo
 import com.darya.gamedrawandguess.model.ShapeType
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
+import javafx.collections.FXCollections
+import javafx.collections.ListChangeListener
 import javafx.fxml.FXML
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -56,18 +59,29 @@ class DrawController {
     private var userName: String = ""
     private var timeLine: Timeline? = null
     private lateinit var serverConnection: ToServer
-    private var playersInfo =  mutableMapOf<Int, Pair<HBox, Label>>()
+    private var playersInfo =  FXCollections.observableArrayList<PlayerInfo>()
     private var drawingHistory = mutableListOf<GameEvent>()
 
     @FXML
     fun initialize() {
+        setUpIU()
+        setUpNetwork()
+    }
+
+    private fun setUpIU() {
         Init.initCanvas(gameCanvas, canvasContainer, drawingHistory)
         Init.initCanvas(tempCanvas, canvasContainer, drawingHistory)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
         Init.initComboBox(shapeComboBox)
         gc = Init.initGraphicContext(gameCanvas, sizeSlider, colorPicker)
+        playersInfo.addListener(ListChangeListener {
+            val nodes = playersInfo.map { createPlayerRow(it) }
+            leftVBox.children.setAll(nodes)
+        })
+    }
 
+    private fun setUpNetwork() {
         serverConnection = ToServer(this)
         val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas)
         if (socket != null) {
@@ -90,36 +104,40 @@ class DrawController {
         val text =messageTextField.text
         if (text.isNotEmpty()) {
             val message: GameEvent = GameEvent.Chat(userName = this.userName, message = text)
-            val jsonMessage = Json.encodeToString(message)
-            out.println(jsonMessage)
+            out.println(Json.encodeToString(message))
             messageTextField.clear()
         }
     }
 
     // СОРТИРГОВАТЬ СВЕРХУ У КОГО БОЛЬШЕ ОЧКОВ
-    private fun updatePlayersInfo() {
-        leftVBox.children.clear()
-        val sortedList = playersInfo.toList().sortedBy { it.second.second.text.toInt() }
-        sortedList.forEach { leftVBox.children.add(it.second.first) }
+    private fun createPlayerRow(player: PlayerInfo): HBox {
+        val scoreLabel = Label().apply {
+            textProperty().bind(player.scoreProperty.asString())
+        }
+        val nameLabel = Label("${player.name}:")
+
+        return HBox(10.0, nameLabel, scoreLabel)
     }
 
     fun updatePlayerScore(id: Int, score: String) {
-        playersInfo[id]!!.second.text = score
+        val newScore = score.toIntOrNull() ?: 0
+        val player = playersInfo.find { it.id == id }
+
+        player?.scoreProperty?.set(newScore)
+
+        playersInfo.sortByDescending { it.scoreProperty.get() }
     }
 
     fun createPlayerInfo(id: Int, userName: String, score: String) {
-        val nameLabel = Label("$userName:")
-        val scoreLabel = Label(score)
-
-        val row = HBox(10.0, nameLabel, scoreLabel) // 10.0 ФИКС СДЕЛАТЬ КОНСТАНТОЙ
-        playersInfo[id] = Pair(row, scoreLabel)
-        updatePlayersInfo()
+        val p = PlayerInfo(id, userName, score.toIntOrNull() ?: 0)
+        playersInfo.add(p)
+        playersInfo.sortByDescending { it.scoreProperty.get() }
     }
 
     fun removePlayerInfo(id: Int) {
-        playersInfo.remove(id)
-        updatePlayersInfo()
+        playersInfo.removeIf { it.id == id }
     }
+
 
     fun clearDrawingHistory() {
         drawingHistory.clear()
@@ -132,24 +150,22 @@ class DrawController {
     @FXML
     fun clearCanvas() {
         val event = GameEvent.Clear
-        val jsonMessage = Json.encodeToString<GameEvent>(event)
-        out.println(jsonMessage)
-        Drawing.clearCanvasToWhite(gameCanvas)
+        out.println(Json.encodeToString<GameEvent>(event))
+        Drawing.clearGameCanvasToWhite(gameCanvas)
     }
 
     fun updateTimer(seconds: Int) {
         timeLine?.stop()
-
         var timeLeft = seconds
+
         timeLine = Timeline(KeyFrame(Duration.seconds(1.0), {
             timeLeft--
             timerLabel.text = "Осталось: $timeLeft"
-
-            if (timeLeft <= 0)  timeLine?.stop()
-        }))
-
-        timeLine?.cycleCount = seconds
-        timeLine?.play()
+            if (timeLeft <= 0) stopTimer()
+        })).apply {
+            cycleCount = seconds
+            play()
+        }
     }
 
     fun stopTimer() {
@@ -166,19 +182,10 @@ class DrawController {
     }
 
     fun setDrawingMode(isPainterMode: Boolean) {
-        if (isPainterMode) {
-           // gameCanvas.disableProperty().set(false)
-            tempCanvas.disableProperty().set(false)
-            messageTextField.disableProperty().set(true)
-            bottomHBox.visibleProperty().set(true)
-        }
-        else {
-            tempCanvas.disableProperty().set(true)
-            messageTextField.disableProperty().set(false)
-            bottomHBox.visibleProperty().set(false)
-            wordLabel.text = "*****"
-        }
+        tempCanvas.isDisable = !isPainterMode
+        messageTextField.isDisable = isPainterMode
+        bottomHBox.isVisible = isPainterMode
+        if (!isPainterMode) { updateWord("*****")}
+
     }
-
-
 }
