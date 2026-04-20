@@ -103,7 +103,7 @@ class DrawController {
     fun onSendBtnClick() {
         val text =messageTextField.text
         if (text.isNotEmpty()) {
-            val message: GameEvent = GameEvent.Chat(userName = this.userName, message = text)
+            val message: GameEvent = GameEvent.Chat("$userName: $text")
             out.println(Json.encodeToString(message))
             messageTextField.clear()
         }
@@ -183,7 +183,7 @@ class DrawController {
 
     fun setDrawingMode(isPainterMode: Boolean) {
         tempCanvas.isDisable = !isPainterMode
-        messageTextField.isDisable = isPainterMode
+       // messageTextField.isDisable = isPainterMode
         bottomHBox.isVisible = isPainterMode
         if (!isPainterMode) { updateWord("*****")}
 

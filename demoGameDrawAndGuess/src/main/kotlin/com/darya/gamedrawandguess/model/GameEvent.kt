@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface GameEvent {
     @Serializable @SerialName("chat")
-    data class Chat(val userName: String, val message: String): GameEvent
+    data class Chat(val message: String): GameEvent
 
     @Serializable @SerialName("draw_shape")
     data class DrawShape(
