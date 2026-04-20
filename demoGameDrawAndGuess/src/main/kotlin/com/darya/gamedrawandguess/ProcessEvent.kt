@@ -47,12 +47,12 @@ class ProcessEvent(private val controller: DrawController,
         events[GameEvent.RoundStart::class] = { event ->
             val roundInfo = event as GameEvent.RoundStart
             controller.updateTimer(roundInfo.seconds)
-            controller.setCurrentPainter(roundInfo.painterName)
+
             if (roundInfo.word != null) {
                 controller.updateWord(roundInfo.word)
                 controller.setDrawingMode(true)
             } else {
-                controller.updateWord("???")
+                controller.setCurrentPainter(roundInfo.painterName)
                 controller.setDrawingMode(false)
             }
         }

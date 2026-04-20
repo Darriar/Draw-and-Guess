@@ -13,11 +13,11 @@ import javafx.fxml.FXML
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ColorPicker
-import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
+import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
@@ -44,17 +44,16 @@ class DrawController {
     @FXML
     private lateinit var timerLabel: Label
     @FXML
-    private lateinit var wordLabel: Label
-    @FXML
     private lateinit var statusLabel: Label
     @FXML
     private lateinit var leftVBox: VBox
     @FXML
     private lateinit var bottomHBox: HBox
     @FXML
-    private lateinit var shapeComboBox: ComboBox<ShapeType>
+    private lateinit var toolsGrid: GridPane
 
     private lateinit var gc: GraphicsContext
+    private var currentTool: ShapeType = ShapeType.FREEHAND
     private lateinit var out: PrintWriter
     private var userName: String = ""
     private var timeLine: Timeline? = null
@@ -64,16 +63,11 @@ class DrawController {
 
     @FXML
     fun initialize() {
-        setUpIU()
-        setUpNetwork()
-    }
-
-    private fun setUpIU() {
         Init.initCanvas(gameCanvas, canvasContainer, drawingHistory)
         Init.initCanvas(tempCanvas, canvasContainer, drawingHistory)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
-        Init.initComboBox(shapeComboBox)
+        Init.initToolButtons(toolsGrid) { selectedType ->  currentTool = selectedType}
         gc = Init.initGraphicContext(gameCanvas, sizeSlider, colorPicker)
         playersInfo.addListener(ListChangeListener {
             val nodes = playersInfo.map { createPlayerRow(it) }
@@ -81,13 +75,14 @@ class DrawController {
         })
     }
 
-    private fun setUpNetwork() {
+
+    fun attemptConnection(): Boolean {
         serverConnection = ToServer(this)
-        val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas)
-        if (socket != null) {
-            out = PrintWriter(socket.getOutputStream(), true)     // МОЖЕТ БЫТЬ NULL
-            Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, shapeComboBox, out)
-        }
+        val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas) ?: return false
+
+        out = PrintWriter(socket.getOutputStream(), true)
+        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, { currentTool }, out)
+        return true
     }
 
     fun setUserName(name: String) {
@@ -96,7 +91,11 @@ class DrawController {
     }
 
     fun setCurrentPainter(name: String) {
-        statusLabel.text = "Рисует $name... Угадайте слово!"
+        statusLabel.text = "Рисует $name Угадайте слово!"
+    }
+
+    fun updateWord(word: String) {
+        statusLabel.text = word
     }
 
     @FXML
@@ -109,7 +108,6 @@ class DrawController {
         }
     }
 
-    // СОРТИРГОВАТЬ СВЕРХУ У КОГО БОЛЬШЕ ОЧКОВ
     private fun createPlayerRow(player: PlayerInfo): HBox {
         val scoreLabel = Label().apply {
             textProperty().bind(player.scoreProperty.asString())
@@ -137,7 +135,6 @@ class DrawController {
     fun removePlayerInfo(id: Int) {
         playersInfo.removeIf { it.id == id }
     }
-
 
     fun clearDrawingHistory() {
         drawingHistory.clear()
@@ -170,12 +167,9 @@ class DrawController {
 
     fun stopTimer() {
         timeLine?.stop()
-        timerLabel.text = "Время вышло!"
+        timerLabel.text = "Конец раунда!"
     }
 
-    fun updateWord(word: String) {
-        wordLabel.text = word
-    }
 
     fun blockCanvas() {
         tempCanvas.disableProperty().set(true)
@@ -183,9 +177,25 @@ class DrawController {
 
     fun setDrawingMode(isPainterMode: Boolean) {
         tempCanvas.isDisable = !isPainterMode
-       // messageTextField.isDisable = isPainterMode
+        messageTextField.isDisable = isPainterMode
         bottomHBox.isVisible = isPainterMode
-        if (!isPainterMode) { updateWord("*****")}
-
     }
+
+    @FXML
+    fun selectFreeHand() { currentTool = ShapeType.FREEHAND}
+
+    @FXML
+    fun selectEraser() { currentTool = ShapeType.ERASER}
+
+    @FXML
+    fun selectFloodFill() { currentTool = ShapeType.FLOODFILL}
+
+    @FXML
+    fun selectLine() { currentTool = ShapeType.LINE}
+
+    @FXML
+    fun selectOval() { currentTool = ShapeType.OVAL}
+
+    @FXML
+    fun selectRect() { currentTool = ShapeType.RECT}
 }

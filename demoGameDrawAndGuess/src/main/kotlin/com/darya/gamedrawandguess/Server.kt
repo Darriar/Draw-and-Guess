@@ -16,11 +16,10 @@ class Server {
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
 
-    private val ROUND_TIME_IN_SECONDS = 1000
+    private val ROUND_TIME_IN_SECONDS = 20
     private val MAX_NUMBER_OF_SCORES = 100
 
     @Volatile private var isGameStarted = false
-   // @Volatile private var isRoundStarted = false
 
     private val fileManager = FileManager
     private var keyWord: String? = null
@@ -116,7 +115,6 @@ class Server {
 
         currentPainter = setPainter()
         keyWord = fileManager.getNextWord()
-        //isRoundStarted = true   // было false и все работало
         roundStartTime = System.currentTimeMillis()
 
         broadcast(GameEvent.Clear)
@@ -141,7 +139,6 @@ class Server {
     private fun stopRound() {
         broadcast(GameEvent.RoundEnd(keyWord!!))
         keyWord = null
-        //isRoundStarted = false
         scheduler.schedule({ startRound() }, 3, TimeUnit.SECONDS)
     }
 }
@@ -149,6 +146,7 @@ class Server {
 fun main() {
     val server = Server()
     val serverSocket = java.net.ServerSocket(8080)
+   // val serverSocket = java.net.ServerSocket(8080, 50, java.net.InetAddress.getByName("0.0.0.0"))
     println("Сервер запущен на порту 8080...")
 
     try {

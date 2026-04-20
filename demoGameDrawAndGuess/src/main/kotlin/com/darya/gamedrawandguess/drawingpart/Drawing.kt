@@ -5,7 +5,6 @@ import com.darya.gamedrawandguess.model.ShapeType
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ColorPicker
-import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
@@ -24,12 +23,12 @@ object Drawing {
             drawShape(shape as GameEvent.DrawShape, canvas)
     }
 
-    fun setupDrawingEvents(gameCanvas: Canvas, tempCanvas: Canvas, colorPicker: ColorPicker, sizeSlider: Slider, shapeComboBox: ComboBox<ShapeType>, out: PrintWriter) {
+    fun setupDrawingEvents(gameCanvas: Canvas, tempCanvas: Canvas, colorPicker: ColorPicker, sizeSlider: Slider, shapeProvider: () -> ShapeType, out: PrintWriter) {
         var startX = 0.0
         var startY = 0.0
 
         fun createShape(event: MouseEvent) {
-            val shapeType = shapeComboBox.value
+            val shapeType = shapeProvider()
             if (shapeType.isFloodFill) return
 
             clearTempCanvas(tempCanvas)
@@ -57,7 +56,8 @@ object Drawing {
             startX = event.x / tempCanvas.width
             startY = event.y / tempCanvas.height
 
-            if (shapeComboBox.value.isFloodFill) {
+            val shapeType = shapeProvider()
+            if (shapeType.isFloodFill) {
                 val fillShape = GameEvent.DrawShape(
                     ShapeType.FLOODFILL, startX, startY, startX, startY,
                     colorPicker.value.toString(), sizeSlider.value, false
@@ -106,8 +106,6 @@ object Drawing {
             ShapeType.FLOODFILL -> {
                 floodFill(x1, y1, shape.color, canvas)
             }
-
-            else -> {}
         }
     }
 

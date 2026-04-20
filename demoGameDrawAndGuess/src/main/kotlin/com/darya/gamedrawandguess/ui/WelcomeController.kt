@@ -24,15 +24,28 @@ class WelcomeController {
             val mainRoot = fxmlLoader.load<Parent>()
 
             val drawController = fxmlLoader.getController<DrawController>()
-            drawController.setUserName(userName)
 
-            val stage = startBtn.scene.window as Stage
-            stage.scene = Scene(mainRoot)
+            val isConnected = drawController.attemptConnection()
+
+            if (isConnected) {
+                drawController.setUserName(userName) // Теперь out точно инициализирован
+                val stage = startBtn.scene.window as Stage
+                stage.scene = Scene(mainRoot)
+            } else {
+                createAlert(Alert.AlertType.ERROR, "Ошибка сети",
+                    "Не удалось подключиться к серверу", "Проверьте, запущен ли сервер.")
+            }
         } else {
-            val alert =Alert(Alert.AlertType.INFORMATION)
-            alert.title ="Ошибка!"
-            alert.headerText = "Введите имя игрока!"
-            alert.showAndWait()
+            createAlert(Alert.AlertType.INFORMATION, "Ошибка ввода имени игрока!", "Пустое имя", "Введите имя игрока!")
+        }
+    }
+
+    private fun createAlert(type: Alert.AlertType, titleA: String, headerA: String, contentA: String): Alert {
+        return  Alert(type).apply {
+            title = titleA
+            headerText = headerA
+            contentText = contentA
+            showAndWait()
         }
     }
 }
