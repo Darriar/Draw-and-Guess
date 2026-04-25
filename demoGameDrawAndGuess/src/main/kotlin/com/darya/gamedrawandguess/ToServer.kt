@@ -9,9 +9,7 @@ import java.net.Socket
 import java.util.*
 
 class ToServer(private val controller: DrawController) {
-
     private var socket: Socket? = null
-
 
     fun connect(chat: TextArea, gameCanvas: Canvas, tempCanvas: Canvas): Socket? {
         try {
@@ -41,7 +39,7 @@ class ToServer(private val controller: DrawController) {
                     val message = input.nextLine()
 
                     Platform.runLater {
-                        eventHandler.processMessage(message)//processMessage(chat, message, gameCanvas)
+                        eventHandler.processMessage(message)
                     }
                 }
             } catch (e: Exception) {

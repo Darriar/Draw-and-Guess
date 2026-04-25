@@ -6,102 +6,126 @@
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.DrawController">
-   <right>
-      <VBox fx:id="rightVBox" BorderPane.alignment="CENTER">
-         <children>
-            <ScrollPane prefHeight="470.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-               <content>
-                  <TextArea fx:id="chatTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true" />
-               </content>
-            </ScrollPane>
-            <HBox prefHeight="100.0" prefWidth="126.0">
-               <children>
-                  <TextField fx:id="messageTextField" onAction="#onSendBtnClick" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="sendBtn" mnemonicParsing="false" onAction="#onSendBtnClick" prefHeight="25.0" prefWidth="105.0" text="Отправить">
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </Button>
-               </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </HBox>
-         </children>
-         <BorderPane.margin>
-            <Insets right="20.0" />
-         </BorderPane.margin>
-      </VBox>
-   </right>
-   <bottom>
-      <HBox fx:id="bottomHBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <GridPane fx:id="toolsGrid">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-            </GridPane>
-            <ColorPicker fx:id="colorPicker" />
-            <Slider fx:id="sizeSlider" />
-            <Button fx:id="clearBtn" mnemonicParsing="false" onAction="#clearCanvas" text="Очистить" />
-         </children>
-         <padding>
-            <Insets top="10.0" />
-         </padding>
-      </HBox>
-   </bottom>
-   <center>
-      <StackPane fx:id="canvasContainer" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <Canvas fx:id="gameCanvas" height="200.0" width="200.0" />
-            <Canvas fx:id="tempCanvas" height="200.0" width="200.0" />
+<BorderPane minWidth="1000.0" minHeight="700.0" prefHeight="800.0" prefWidth="1200.0" styleClass="root-pane" stylesheets="@draw_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.DrawController">
 
-         </children>
-         <BorderPane.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </BorderPane.margin>
-      </StackPane>
-   </center>
-   <top>
-      <GridPane BorderPane.alignment="CENTER">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Label fx:id="statusLabel" text="не подключено" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <Label fx:id="timerLabel" text="не подключено" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <Label text="Статус" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-            <Label text="Таймер" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-         </children>
-      </GridPane>
-   </top>
-   <left>
-      <VBox fx:id="leftVBox" prefHeight="240.0" prefWidth="130.0" BorderPane.alignment="CENTER" />
-   </left>
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="20.0" />
+    </padding>
+
+    <top>
+        <VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="timerLabel" styleClass="timer-badge" text="00:34" />
+                <Label fx:id="statusLabel" styleClass="hint-label" text="Подсказка: Напиток" />
+            </children>
+            <padding>
+                <Insets bottom="20.0" />
+            </padding>
+        </VBox>
+    </top>
+
+    <left>
+        <VBox prefWidth="220.0" spacing="20.0" styleClass="side-card">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <BorderPane.margin>
+                <Insets right="20.0" />
+            </BorderPane.margin>
+
+            <children>
+                <StackPane VBox.vgrow="ALWAYS">
+                    <children>
+                        <VBox fx:id="toolsPane" spacing="15.0">
+                            <children>
+                                <Label styleClass="small-header" text="ИНСТРУМЕНТЫ" />
+                                <VBox fx:id="toolsVBox" spacing="12.0" alignment="TOP_CENTER" />
+                            </children>
+                        </VBox>
+
+                        <VBox fx:id="playersPane" spacing="15.0" visible="false" managed="false" VBox.vgrow="ALWAYS">
+                            <children>
+                                <Label styleClass="small-header" text="ИГРОКИ" />
+
+                                <ScrollPane fitToWidth="true"
+                                            hbarPolicy="NEVER"
+                                            vbarPolicy="AS_NEEDED"
+                                            styleClass="no-border-scroll"
+                                            VBox.vgrow="ALWAYS"> <content>
+                                    <VBox fx:id="playersVBox" spacing="8.0" />
+                                </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20.0" BorderPane.alignment="CENTER">
+            <children>
+                <StackPane fx:id="canvasContainer" styleClass="canvas-card" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Canvas fx:id="gameCanvas" height="500.0" width="700.0" />
+                        <Canvas fx:id="tempCanvas" height="500.0" width="700.0" />
+                    </children>
+                </StackPane>
+
+                <HBox fx:id="bottomHBox" alignment="CENTER" prefHeight="80.0" spacing="25.0" styleClass="bottom-card">
+                    <children>
+                        <ColorPicker fx:id="colorPicker" styleClass="modern-picker" />
+                        <Separator orientation="VERTICAL" />
+                        <VBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <Label style="-fx-font-size: 11; -fx-text-fill: #888;" text="Размер кисти" />
+                                <Slider fx:id="sizeSlider" prefWidth="150.0" />
+                            </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" />
+                        <Button fx:id="clearBtn" onAction="#clearCanvas" styleClass="clear-btn" text="Очистить" />
+                    </children>
+                    <padding>
+                        <Insets left="20.0" right="20.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </VBox>
+    </center>
+
+    <right>
+        <VBox prefWidth="280.0" spacing="20.0" BorderPane.alignment="CENTER">
+            <children>
+
+                <VBox spacing="10.0" styleClass="side-card" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="small-header" text="ЧАТ" />
+                        <TextArea fx:id="chatTextArea" editable="false" styleClass="chat-area" wrapText="true" VBox.vgrow="ALWAYS" />
+                        <HBox spacing="5.0">
+                            <children>
+                                <TextField fx:id="messageTextField" onAction="#onSendBtnClick" promptText="Ваш ответ..." styleClass="modern-field" HBox.hgrow="ALWAYS" />
+                                <Button fx:id="sendBtn" onAction="#onSendBtnClick" styleClass="send-btn" text="➤" />
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                </VBox>
+            </children>
+            <BorderPane.margin>
+                <Insets left="20.0" />
+            </BorderPane.margin>
+        </VBox>
+    </right>
 </BorderPane>

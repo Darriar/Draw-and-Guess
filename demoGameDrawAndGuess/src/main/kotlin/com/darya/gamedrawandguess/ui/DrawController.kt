@@ -10,6 +10,7 @@ import javafx.animation.Timeline
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.fxml.FXML
+import javafx.geometry.Pos
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ColorPicker
@@ -17,14 +18,14 @@ import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
-import javafx.scene.layout.GridPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.StackPane
-import javafx.scene.layout.VBox
+import javafx.scene.layout.*
+import javafx.scene.paint.Color
+import javafx.scene.shape.Circle
 import javafx.util.Duration
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.PrintWriter
+import kotlin.math.abs
 
 class DrawController {
     @FXML
@@ -46,11 +47,13 @@ class DrawController {
     @FXML
     private lateinit var statusLabel: Label
     @FXML
-    private lateinit var leftVBox: VBox
-    @FXML
     private lateinit var bottomHBox: HBox
     @FXML
-    private lateinit var toolsGrid: GridPane
+    private lateinit var toolsVBox: VBox
+    @FXML
+    private lateinit var toolsPane: VBox
+    @FXML
+    private lateinit var playersPane: VBox
 
     private lateinit var gc: GraphicsContext
     private var currentTool: ShapeType = ShapeType.FREEHAND
@@ -67,14 +70,14 @@ class DrawController {
         Init.initCanvas(tempCanvas, canvasContainer, drawingHistory)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
-        Init.initToolButtons(toolsGrid) { selectedType ->  currentTool = selectedType}
+        Init.initToolButtons(toolsVBox) { selectedType ->  currentTool = selectedType}
         gc = Init.initGraphicContext(gameCanvas, sizeSlider, colorPicker)
         playersInfo.addListener(ListChangeListener {
             val nodes = playersInfo.map { createPlayerRow(it) }
-            leftVBox.children.setAll(nodes)
+            playersPane.children.remove(1, playersPane.children.size)
+            playersPane.children.addAll(nodes)
         })
     }
-
 
     fun attemptConnection(): Boolean {
         serverConnection = ToServer(this)
@@ -106,15 +109,37 @@ class DrawController {
             out.println(Json.encodeToString(message))
             messageTextField.clear()
         }
+        gameCanvas.graphicsContext2D.stroke = Color.BLACK
+        gameCanvas.graphicsContext2D.strokeRect(100.0, 100.0, 104.0, 104.0)
+        Drawing.floodFill(102.0, 102.0, Color.RED.toString(), gameCanvas)
     }
 
     private fun createPlayerRow(player: PlayerInfo): HBox {
-        val scoreLabel = Label().apply {
-            textProperty().bind(player.scoreProperty.asString())
+        val nameLabel = Label(player.name).apply {
+            styleClass.add("player-name")
+            maxWidth = Double.MAX_VALUE
+            HBox.setHgrow(this, Priority.ALWAYS)
         }
-        val nameLabel = Label("${player.name}:")
 
-        return HBox(10.0, nameLabel, scoreLabel)
+        val scoreLabel = Label().apply {
+            textProperty().bind(player.scoreProperty.asString("%d PTS"))
+            styleClass.add("player-score")
+        }
+
+        val playerColor = generateColorFromString(player.name)
+        val avatar = Circle(16.0, playerColor)
+
+        return HBox(12.0, avatar, nameLabel, scoreLabel).apply {
+            alignment = Pos.CENTER_LEFT
+            styleClass.add("player-row-container")
+        }
+    }
+
+    private fun generateColorFromString(input: String): Color {
+        val hash = input.hashCode()
+
+        val hue = abs(hash % 360).toDouble()
+        return Color.hsb(hue, 0.4, 0.9)
     }
 
     fun updatePlayerScore(id: Int, score: String) {
@@ -148,7 +173,7 @@ class DrawController {
     fun clearCanvas() {
         val event = GameEvent.Clear
         out.println(Json.encodeToString<GameEvent>(event))
-        Drawing.clearGameCanvasToWhite(gameCanvas)
+        Drawing.clearCanvas(gameCanvas)
     }
 
     fun updateTimer(seconds: Int) {
@@ -179,23 +204,13 @@ class DrawController {
         tempCanvas.isDisable = !isPainterMode
         messageTextField.isDisable = isPainterMode
         bottomHBox.isVisible = isPainterMode
+
+        toolsPane.isVisible = isPainterMode
+        toolsPane.isManaged = isPainterMode
+
+        playersPane.isVisible = !isPainterMode
+        playersPane.isManaged = !isPainterMode
+
     }
 
-    @FXML
-    fun selectFreeHand() { currentTool = ShapeType.FREEHAND}
-
-    @FXML
-    fun selectEraser() { currentTool = ShapeType.ERASER}
-
-    @FXML
-    fun selectFloodFill() { currentTool = ShapeType.FLOODFILL}
-
-    @FXML
-    fun selectLine() { currentTool = ShapeType.LINE}
-
-    @FXML
-    fun selectOval() { currentTool = ShapeType.OVAL}
-
-    @FXML
-    fun selectRect() { currentTool = ShapeType.RECT}
 }

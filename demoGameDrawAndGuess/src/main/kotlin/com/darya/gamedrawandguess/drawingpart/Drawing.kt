@@ -18,7 +18,7 @@ import kotlin.math.abs
 object Drawing {
 
     fun redraw(canvas: Canvas, drawingHistory: MutableList<GameEvent>) {
-        clearGameCanvasToWhite(canvas)
+        clearCanvas(canvas)
         for (shape in drawingHistory)
             drawShape(shape as GameEvent.DrawShape, canvas)
     }
@@ -31,7 +31,7 @@ object Drawing {
             val shapeType = shapeProvider()
             if (shapeType.isFloodFill) return
 
-            clearTempCanvas(tempCanvas)
+            clearCanvas(tempCanvas)
             val currentX = event.x / tempCanvas.width
             val currentY = event.y / tempCanvas.height
 
@@ -109,7 +109,7 @@ object Drawing {
         }
     }
 
-    private fun floodFill(startX: Double, startY: Double, color: String, canvas: Canvas) {
+    fun floodFill(startX: Double, startY: Double, color: String, canvas: Canvas) {
         val snapshot = canvas.snapshot(null, null)
         val reader = snapshot.pixelReader
         val writer = canvas.graphicsContext2D.pixelWriter
@@ -117,8 +117,8 @@ object Drawing {
         val height = canvas.height.toInt()
 
         val fillColor = Color.web(color)
-        val targetColor = reader.getColor(startX.toInt(), startY.toInt())
-        if (targetColor == fillColor) return
+        val startColor = reader.getColor(startX.toInt(), startY.toInt())
+        if (startColor == fillColor) return
 
         val points = ArrayDeque<Pair<Int, Int>>()
         points.add(startX.toInt() to startY.toInt())
@@ -126,17 +126,20 @@ object Drawing {
 
         while (points.isNotEmpty()) {
             val (x, y) = points.removeFirst()
-
             if (x < 0 || x >= width || y < 0 || y >= height) continue
-            if (visitedPoints[x][y] || reader.getColor(x, y) != targetColor) continue
+            if (visitedPoints[x][y]) continue
 
             writer.setColor(x, y, fillColor)
             visitedPoints[x][y] = true
 
-            points.add(x + 1 to y)
-            points.add(x - 1 to y)
-            points.add(x to y + 1)
-            points.add(x to y - 1)
+            val currentColor = reader.getColor(x, y)
+            if (currentColor == startColor) {   // еще не контур
+                points.add(x + 1 to y)
+                points.add(x - 1 to y)
+                points.add(x to y + 1)
+                points.add(x to y - 1)
+            }
+            println("x=$x y=$y current=$currentColor start=$startColor")
         }
     }
 
@@ -150,13 +153,7 @@ object Drawing {
         }
     }
 
-    fun clearGameCanvasToWhite(canvas: Canvas) {
-        val gc = canvas.graphicsContext2D
-        gc.fill = Color.WHITE
-        gc.fillRect(0.0, 0.0, canvas.width, canvas.height)
-    }
-
-    fun clearTempCanvas(canvas: Canvas) {
+    fun clearCanvas(canvas: Canvas) {
         canvas.graphicsContext2D.clearRect(0.0, 0.0, canvas.width, canvas.height)
     }
 

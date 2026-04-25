@@ -7,10 +7,8 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Button
 import javafx.scene.control.ColorPicker
-import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
-import javafx.scene.layout.GridPane
-import javafx.scene.layout.StackPane
+import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.StrokeLineCap
 
@@ -56,30 +54,23 @@ object Init {
         return gc
     }
 
-    fun initToolButtons(toolsGrid: GridPane, onToolSelected: (ShapeType) -> Unit) {
+    fun initToolButtons(toolsVBox: VBox, onToolSelected: (ShapeType) -> Unit) {
         val types = ShapeType.entries
-
-        var column = 0
-        var row = 0
-        val maxRows = 2
 
         for (type in types) {
             val button = Button(type.toString()).apply {
-                maxWidth = Double.MAX_VALUE // Чтобы кнопка растягивалась по ширине ячейки
+                maxWidth = Double.MAX_VALUE
+
+                styleClass.add("tool-button")
 
                 setOnAction {
                     onToolSelected(type)
                 }
             }
 
-            toolsGrid.add(button, column, row)
-
-            row++
-            if (row >= maxRows) {
-                row = 0
-                column++
-            }
+            toolsVBox.children.add(button)
         }
     }
+
 
 }

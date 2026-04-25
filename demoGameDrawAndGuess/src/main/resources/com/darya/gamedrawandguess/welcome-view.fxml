@@ -2,11 +2,20 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.WelcomeController">
+<StackPane prefHeight="466.0" prefWidth="620.0" stylesheets="@welcome_style.css" styleClass="root-pane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.WelcomeController">
    <children>
-      <Button fx:id="startBtn" focusTraversable="false" layoutX="227.0" layoutY="208.0" mnemonicParsing="false" onAction="#onStartBtnClick" prefHeight="63.0" prefWidth="145.0" text="Играть" />
-      <TextField fx:id="inputNameText" layoutX="225.0" layoutY="115.0" onAction="#onStartBtnClick" promptText="Ведите имя игрока" />
+      <VBox alignment="CENTER" spacing="20.0" maxWidth="350.0" maxHeight="350.0" styleClass="main-container">
+         <children>
+            <Label text="Вход в игру" styleClass="title-label" />
+
+            <TextField fx:id="inputNameText" prefHeight="45.0" onAction="#onStartBtnClick" promptText="Введите ваш никнейм" styleClass="custom-text-field" />
+
+            <Button fx:id="startBtn" focusTraversable="false" mnemonicParsing="false" onAction="#onStartBtnClick" prefHeight="50.0" prefWidth="180.0" text="Играть" styleClass="main-button" />
+         </children>
+      </VBox>
    </children>
-</AnchorPane>
+</StackPane>

@@ -24,7 +24,7 @@ class ProcessEvent(private val controller: DrawController,
     private fun setUpEventsMap() {
         events[GameEvent.DrawShape::class] = { event ->
             val drawEvent = event as GameEvent.DrawShape
-            Drawing.clearTempCanvas(tempCanvas)
+            Drawing.clearCanvas(tempCanvas)
             if (drawEvent.isPreview) {
                 Drawing.drawShape(drawEvent, tempCanvas)
             } else {
@@ -39,8 +39,8 @@ class ProcessEvent(private val controller: DrawController,
         }
 
         events[GameEvent.Clear::class] = {
-            Drawing.clearGameCanvasToWhite(gameCanvas)
-            Drawing.clearTempCanvas(tempCanvas)
+            Drawing.clearCanvas(gameCanvas)
+            Drawing.clearCanvas(tempCanvas)
             controller.clearDrawingHistory()
         }
 

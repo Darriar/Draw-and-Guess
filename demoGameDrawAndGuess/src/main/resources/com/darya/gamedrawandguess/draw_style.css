@@ -1,0 +1,239 @@
+/* 1. ОСНОВА И ФОН */
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", sans-serif;
+}
+
+.root-pane {
+    -fx-background-color: #f0f2f5;
+}
+
+/* 2. ПАНЕЛИ (КАРТОЧКИ) */
+.side-card, .canvas-card, .bottom-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);
+}
+
+/* Анимация плавного переключения панелей в сайдбаре */
+.side-card .vbox {
+    -fx-transition: opacity 0.3s ease-in-out;
+}
+
+/* 3. ЗАГОЛОВКИ И ВЕРХНЯЯ ПАНЕЛЬ */
+.small-header {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: 800;
+    -fx-font-size: 11px;
+    -fx-letter-spacing: 1px;
+    -fx-text-fill: #9a9ea4;
+    -fx-text-transform: uppercase;
+}
+
+.timer-badge {
+    -fx-background-color: #4cc355;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+    -fx-padding: 8 30;
+    -fx-background-radius: 25;
+}
+
+/* Главное слово, которое нужно нарисовать */
+.hint-label {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 26px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #2c3e50;
+    -fx-letter-spacing: 0.5px;
+}
+
+/* Дополнительный класс для выделения слова цветом */
+.word-to-draw {
+    -fx-text-fill: #4cc355;
+    -fx-background-color: #edf7ee;
+    -fx-padding: 2 12;
+    -fx-background-radius: 8;
+}
+
+/* 4. ИНСТРУМЕНТЫ (ЛЕВАЯ ПАНЕЛЬ) */
+.tool-button {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-color: #e4e6eb;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4b4b4b;
+    -fx-cursor: hand;
+}
+
+.tool-button:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #4cc355;
+    -fx-effect: dropshadow(three-pass-box, rgba(76, 195, 85, 0.2), 10, 0, 0, 0);
+}
+
+.tool-button:pressed {
+    -fx-background-color: #edf7ee;
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* 5. ВЫБОР ЦВЕТА И КНОПКИ УПРАВЛЕНИЯ */
+.modern-picker {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #e4e6eb;
+    -fx-border-radius: 12;
+    -fx-padding: 5;
+}
+
+.modern-picker .color-rect {
+    -fx-background-radius: 8;
+}
+
+.modern-picker .arrow-button {
+    -fx-padding: 0 10 0 0;
+}
+
+.clear-btn {
+    -fx-background-color: #ffeded;
+    -fx-text-fill: #ff4d4f;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+/* 6. СПИСОК ИГРОКОВ */
+.player-row-container {
+    -fx-padding: 8 12;
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #f0f2f5;
+    -fx-border-width: 0 0 1 0;
+}
+
+.player-row-container:hover {
+    -fx-background-color: #f9f9f9;
+}
+
+.player-name {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1a1a1a;
+}
+
+.player-score {
+    -fx-font-family: "Segoe UI Semibold", sans-serif;
+    -fx-font-size: 13px;
+    -fx-text-fill: #65676b;
+}
+
+/* 7. ЧАТ И ВВОД СООБЩЕНИЙ */
+.chat-area {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 16px;
+}
+
+/* Жесткая фиксация шрифта чата */
+.chat-area .text {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 16px !important;
+    -fx-fill: #2c3e50;
+}
+
+.chat-area .content {
+    -fx-background-color: white;
+    -fx-line-spacing: 5px;
+    -fx-padding: 15;
+}
+
+.modern-field {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-border-color: #e4e6eb;
+    -fx-background-color: white;
+    -fx-padding: 8;
+}
+
+.send-btn {
+    -fx-background-color: #4cc355;
+    -fx-text-fill: white;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+}
+
+/* 8. СКРОЛЛБАР ЧАТА (КАСТОМНЫЙ) */
+.chat-area .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-width: 8px;
+    -fx-padding: 0 2 0 0;
+}
+
+.chat-area .scroll-bar:vertical .thumb {
+    -fx-background-color: #dee2e6;
+    -fx-background-radius: 10;
+}
+
+.chat-area .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #bcc0c4;
+}
+
+.chat-area .scroll-bar .increment-button,
+.chat-area .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.chat-area .scroll-bar .increment-arrow,
+.chat-area .scroll-bar .decrement-arrow {
+    -fx-shape: "";
+}
+
+/* --- КРАСИВАЯ ПРОКРУТКА ДЛЯ ВСЕХ SCROLLPANE --- */
+.no-border-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.no-border-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Настройка вертикального скроллбара */
+.no-border-scroll .scroll-bar:vertical {
+    -fx-background-color: rgba(240, 242, 245, 0.5); /* Едва заметный фон дорожки */
+    -fx-width: 6px;
+}
+
+.no-border-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #dee2e6;
+    -fx-background-radius: 10;
+}
+
+.no-border-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #bcc0c4;
+}
+
+/* Убираем лишние кнопки */
+.no-border-scroll .scroll-bar .increment-button,
+.no-border-scroll .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.no-border-scroll .scroll-bar .increment-arrow,
+.no-border-scroll .scroll-bar .decrement-arrow {
+    -fx-shape: "";
+}

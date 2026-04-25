@@ -16,7 +16,7 @@ class Server {
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
 
-    private val ROUND_TIME_IN_SECONDS = 20
+    private val ROUND_TIME_IN_SECONDS = 1000
     private val MAX_NUMBER_OF_SCORES = 100
 
     @Volatile private var isGameStarted = false
