@@ -56,7 +56,7 @@ class DrawController {
     private lateinit var playersPane: VBox
 
     private lateinit var gc: GraphicsContext
-    private var currentTool: ShapeType = ShapeType.FREEHAND
+    private var currentTool: ShapeType = ShapeType.PENCIL
     private lateinit var out: PrintWriter
     private var userName: String = ""
     private var timeLine: Timeline? = null
@@ -109,9 +109,6 @@ class DrawController {
             out.println(Json.encodeToString(message))
             messageTextField.clear()
         }
-        gameCanvas.graphicsContext2D.stroke = Color.BLACK
-        gameCanvas.graphicsContext2D.strokeRect(100.0, 100.0, 104.0, 104.0)
-        Drawing.floodFill(102.0, 102.0, Color.RED.toString(), gameCanvas)
     }
 
     private fun createPlayerRow(player: PlayerInfo): HBox {

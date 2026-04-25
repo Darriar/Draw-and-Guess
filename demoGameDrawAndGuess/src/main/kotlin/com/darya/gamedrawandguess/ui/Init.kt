@@ -62,8 +62,15 @@ object Init {
                 maxWidth = Double.MAX_VALUE
 
                 styleClass.add("tool-button")
+                if (type == ShapeType.PENCIL) { // замени на свой дефолтный тип
+                    styleClass.add("active-tool")
+                }
 
                 setOnAction {
+                    toolsVBox.children.filterIsInstance<Button>().forEach {
+                        it.styleClass.remove("active-tool")
+                    }
+                    styleClass.add("active-tool")
                     onToolSelected(type)
                 }
             }

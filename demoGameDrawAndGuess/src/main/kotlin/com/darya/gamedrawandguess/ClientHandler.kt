@@ -39,5 +39,6 @@ class ClientHandler(private val socket: Socket, private val server: Server): Thr
 
     fun sendEvent(event: GameEvent) {
         output.println(Json.encodeToString(event))
+        println(event.javaClass)
     }
 }

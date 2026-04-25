@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane minWidth="1000.0" minHeight="700.0" prefHeight="800.0" prefWidth="1200.0" styleClass="root-pane" stylesheets="@draw_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.DrawController">
+<BorderPane minHeight="700.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1200.0" styleClass="root-pane" stylesheets="@draw_style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.DrawController">
 
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="20.0" />
@@ -48,19 +48,15 @@
                         <VBox fx:id="toolsPane" spacing="15.0">
                             <children>
                                 <Label styleClass="small-header" text="ИНСТРУМЕНТЫ" />
-                                <VBox fx:id="toolsVBox" spacing="12.0" alignment="TOP_CENTER" />
+                                <VBox fx:id="toolsVBox" alignment="TOP_CENTER" spacing="12.0" />
                             </children>
                         </VBox>
 
-                        <VBox fx:id="playersPane" spacing="15.0" visible="false" managed="false" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="playersPane" managed="false" spacing="15.0" visible="false" VBox.vgrow="ALWAYS">
                             <children>
                                 <Label styleClass="small-header" text="ИГРОКИ" />
 
-                                <ScrollPane fitToWidth="true"
-                                            hbarPolicy="NEVER"
-                                            vbarPolicy="AS_NEEDED"
-                                            styleClass="no-border-scroll"
-                                            VBox.vgrow="ALWAYS"> <content>
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="no-border-scroll" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS"> <content>
                                     <VBox fx:id="playersVBox" spacing="8.0" />
                                 </content>
                                 </ScrollPane>

@@ -9,7 +9,6 @@ import javafx.scene.control.TextArea
 import kotlinx.serialization.json.Json
 import kotlin.reflect.KClass
 
-
 class ProcessEvent(private val controller: DrawController,
                    private val chat: TextArea,
                    private val gameCanvas: Canvas,

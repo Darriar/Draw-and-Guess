@@ -100,7 +100,7 @@ object Drawing {
                     gc.strokeRect(x, y, w, h)
 
             }
-            ShapeType.LINE, ShapeType.FREEHAND, ShapeType.ERASER -> {
+            ShapeType.LINE, ShapeType.PENCIL, ShapeType.ERASER -> {
                 gc.strokeLine(x1, y1, x2, y2)
             }
             ShapeType.FLOODFILL -> {
@@ -109,7 +109,7 @@ object Drawing {
         }
     }
 
-    fun floodFill(startX: Double, startY: Double, color: String, canvas: Canvas) {
+    private fun floodFill(startX: Double, startY: Double, color: String, canvas: Canvas) {
         val snapshot = canvas.snapshot(null, null)
         val reader = snapshot.pixelReader
         val writer = canvas.graphicsContext2D.pixelWriter
@@ -139,7 +139,6 @@ object Drawing {
                 points.add(x to y + 1)
                 points.add(x to y - 1)
             }
-            println("x=$x y=$y current=$currentColor start=$startColor")
         }
     }
 

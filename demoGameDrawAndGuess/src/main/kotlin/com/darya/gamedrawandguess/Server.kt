@@ -36,7 +36,8 @@ class Server {
         }
 
         clients.forEach { client ->
-            if (!(client == sender && event !is GameEvent.Chat))    // рисование отправлять или нет
+            //if (!(client == sender && event !is GameEvent.Chat))    // рисование отправлять или нет
+            if (client != currentPainter || event is GameEvent.Chat)
                 client.sendEvent(event)
         }
 
@@ -106,6 +107,7 @@ class Server {
     }
 
     private fun startRound() {
+        broadcast(GameEvent.Clear)
         if (clients.isEmpty()) {
             isGameStarted = false
             return
@@ -117,7 +119,7 @@ class Server {
         keyWord = fileManager.getNextWord()
         roundStartTime = System.currentTimeMillis()
 
-        broadcast(GameEvent.Clear)
+
         clients.forEach { client ->
             client.isGuess = false
             val word = if (client == currentPainter) keyWord else null
