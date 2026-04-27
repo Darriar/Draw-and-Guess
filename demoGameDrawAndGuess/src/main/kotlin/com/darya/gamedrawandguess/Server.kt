@@ -1,7 +1,9 @@
 package com.darya.gamedrawandguess
 
 import com.darya.gamedrawandguess.model.GameEvent
+import com.darya.gamedrawandguess.model.ShapeType
 import com.darya.gamedrawandguess.util.FileManager
+import javafx.scene.paint.Color
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -16,7 +18,7 @@ class Server {
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
 
-    private val ROUND_TIME_IN_SECONDS = 1000
+    private val ROUND_TIME_IN_SECONDS = 10
     private val MAX_NUMBER_OF_SCORES = 100
 
     @Volatile private var isGameStarted = false
@@ -31,7 +33,6 @@ class Server {
     private fun broadcast(event: GameEvent, sender: ClientHandler? = null) {
         when (event) {
             is GameEvent.DrawShape -> { if (!event.isPreview) drawingHistory.add(event) }
-            is GameEvent.Clear -> drawingHistory.clear()
             else -> {}
         }
 
@@ -92,7 +93,7 @@ class Server {
         broadcast(GameEvent.RemoveClient(client.id, client.userName))
 
         if (client == currentPainter) {
-            broadcast(GameEvent.Chat("CHAT:Художник отключился. Начинаем новый раунд..."))
+            broadcast(GameEvent.Chat("Художник отключился. Начинаем новый раунд."))
             currentPainterIndex--
             forceStopRound()
         } else {
@@ -107,7 +108,8 @@ class Server {
     }
 
     private fun startRound() {
-        broadcast(GameEvent.Clear)
+        broadcast(GameEvent.DrawShape(ShapeType.CLEAR, 0.0, 0.0, 0.0, 0.0, Color.WHITE.toString(), 0.0,false))
+        drawingHistory.clear()
         if (clients.isEmpty()) {
             isGameStarted = false
             return
@@ -143,13 +145,32 @@ class Server {
         keyWord = null
         scheduler.schedule({ startRound() }, 3, TimeUnit.SECONDS)
     }
+
+    fun stop() {
+        println("Остановка сервера...")
+        isGameStarted = false
+        currentRoundTask?.cancel(true)
+        scheduler.shutdownNow()
+
+        clients.forEach { it.closeConnection() }
+        clients.clear()
+    }
 }
+
+
 
 fun main() {
     val server = Server()
     val serverSocket = java.net.ServerSocket(8080)
    // val serverSocket = java.net.ServerSocket(8080, 50, java.net.InetAddress.getByName("0.0.0.0"))
     println("Сервер запущен на порту 8080...")
+
+    Runtime.getRuntime().addShutdownHook(Thread {
+        server.stop()
+        if (!serverSocket.isClosed) {
+            serverSocket.close()
+        }
+    })
 
     try {
         while (true) {

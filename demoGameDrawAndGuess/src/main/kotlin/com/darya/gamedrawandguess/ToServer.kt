@@ -20,7 +20,7 @@ class ToServer(private val controller: DrawController) {
             //socket = Socket(host, port)
             socket = Socket("localhost", 8080)     // 10.177.142.105    192.168.100.11
             startListening(chat, gameCanvas, tempCanvas)
-            chat.appendText("Система: Вы подключены к серверу!\n")
+            chat.appendText("Вы подключены к серверу!\n")
             return socket
         } catch (e: Exception) {
             chat.appendText("Ошибка: Не удалось подключиться.\n")
@@ -44,7 +44,7 @@ class ToServer(private val controller: DrawController) {
                 }
             } catch (e: Exception) {
                 Platform.runLater {
-                    chat.appendText("Система: Соединение разорвано.\n")
+                    chat.appendText("Соединение разорвано.\n")
                 }
             }
         }.start()

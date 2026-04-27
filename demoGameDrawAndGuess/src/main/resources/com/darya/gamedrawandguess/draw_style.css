@@ -105,22 +105,132 @@
     -fx-border-color: #e4e6eb;
     -fx-border-radius: 12;
     -fx-padding: 5;
+    -fx-font-family: "Segoe UI", sans-serif;
+        -fx-font-weight: 700;
+        -fx-font-size: 16px;
+        -fx-text-fill: #2c3e50;
+}
+
+.modern-picker > .color-picker-label {
+    -fx-graphic-text-gap: 15px; /* Это свойство специально для расстояния между текстом и иконкой/квадратом */
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: 800;
+    -fx-font-size: 15px;
+    -fx-text-fill: #2c3e50;
 }
 
 .modern-picker .color-rect {
     -fx-background-radius: 8;
+
 }
 
 .modern-picker .arrow-button {
     -fx-padding: 0 10 0 0;
 }
 
+/* Текст заголовков внутри палитры (если есть) */
+.color-picker-grid .label {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-text-fill: #9a9ea4;
+}
+
+/* Кнопка "Custom Color..." */
+.color-picker-grid .hyperlink {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: 700;
+    -fx-font-size: 14px;
+    -fx-text-fill: #4cc355;
+    -fx-underline: false;
+}
+
 .clear-btn {
-    -fx-background-color: #ffeded;
-    -fx-text-fill: #ff4d4f;
-    -fx-font-weight: bold;
-    -fx-background-radius: 10;
+    /* 1. Цвет: уходим от красного к нейтральному светло-серому/голубому */
+    -fx-background-color: #f0f2f5;
+    -fx-text-fill: #4b4b4b;
+
+    /* 2. Шрифт: делаем его жирнее и чуть больше */
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-letter-spacing: 0.5px;
+    -fx-text-transform: uppercase; /* Текст в верхнем регистре для важности */
+
+    /* 3. Размер: увеличиваем padding, чтобы кнопка стала больше */
+    -fx-padding: 10 25;
+    -fx-background-radius: 12;
+    -fx-border-color: #e4e6eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+
     -fx-cursor: hand;
+}
+
+.clear-btn:hover {
+    -fx-background-color: #e4e6eb;
+    -fx-border-color: #bcc0c4;
+    /* Легкая тень при наведении для объема */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+.clear-btn:pressed {
+    -fx-background-color: #d8dadf;
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+}
+
+.brush-size-label {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: 800; /* Жирный шрифт */
+    -fx-font-size: 16px !important;   /* Заметно крупнее */
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 8 0;
+}
+
+/* Сам слайдер */
+.slider {
+    -fx-padding: -5 0;
+}
+
+/* Дорожка (горизонтальная линия) */
+.slider .track {
+    -fx-background-color: #e4e6eb;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+    -fx-pref-height: 6px; /* Делаем линию чуть мягче */
+}
+
+/* КРУГЛЫЙ ПОЛЗУНОК */
+.slider .thumb {
+    -fx-background-color: white;
+    -fx-background-radius: 50%; /* Идеальный круг */
+
+    /* Цвет обводки под твой основной зеленый #4cc355 */
+    -fx-border-color: #4cc355;
+    -fx-border-width: 3;
+    -fx-border-radius: 50%;
+
+    /* Размер круга */
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+
+    /* Тень для объема, как у твоих карточек */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+/* Состояние при наведении на ползунок */
+.slider .thumb:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-scale-x: 1.1; /* Немного увеличивается при наведении */
+    -fx-scale-y: 1.1;
+}
+
+/* Состояние при нажатии */
+.slider .thumb:pressed {
+    -fx-background-color: #edf7ee;
+    -fx-border-color: #3da845;
 }
 
 /* 6. СПИСОК ИГРОКОВ */
@@ -186,8 +296,32 @@
 .send-btn {
     -fx-background-color: #4cc355;
     -fx-text-fill: white;
-    -fx-background-radius: 15;
+    -fx-background-radius: 12;
+
+    /* Шрифт: делаем его заметным */
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: 800;
+    -fx-font-size: 14px;
+    -fx-text-transform: uppercase;
+    -fx-letter-spacing: 0.5px;
+
+    /* Размер: увеличиваем кнопку за счет отступов */
+    -fx-padding: 10 25;
+
     -fx-cursor: hand;
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.send-btn:hover {
+    -fx-background-color: #3da845; /* Чуть темнее при наведении */
+    /* Свечение в тон кнопки */
+    -fx-effect: dropshadow(three-pass-box, rgba(76, 195, 85, 0.3), 10, 0, 0, 0);
+}
+
+.send-btn:pressed {
+    -fx-background-color: #35913c;
+    -fx-scale-x: 0.95; /* Легкий эффект нажатия */
+    -fx-scale-y: 0.95;
 }
 
 /* 8. СКРОЛЛБАР ЧАТА (КАСТОМНЫЙ) */
@@ -254,3 +388,4 @@
 .no-border-scroll .scroll-bar .decrement-arrow {
     -fx-shape: "";
 }
+

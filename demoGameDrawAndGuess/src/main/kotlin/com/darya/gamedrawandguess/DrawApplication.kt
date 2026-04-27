@@ -16,7 +16,7 @@ class DrawApplication : Application() {
         stage.minHeight = 700.0
 
         stage.title = "Draw && Guess!"
-        stage.icons.add(Image(javaClass.getResourceAsStream("/icons/app_icon.png")))
+        stage.icons.add(Image(javaClass.getResourceAsStream("/images/app_icon.png")))
         stage.scene = scene
         stage.show()
     }
@@ -30,18 +30,14 @@ fun main() {
     Application.launch(DrawApplication::class.java)
 }
 
-
 // конец  раунда и таймер пошел раньше чем слово сменилось
 
-// кнопки красивые сделать картинки
+// сделать отмену действия и возврат
 
 // если сервер отключился отключать всех
 // сети зайти в комнату создать показывать доступные создать порт занимать
 
+// сделать красивые алерты
+
 // playerinfo initialscore зачем
-
-
-// забить
-// чтобы имя игрока нормально помещалось и переносилось в результатах
-// если пишу в чате длинное сообщение то сразу на новую строку переносит
-// имя игрока в чате выделять цветом
+// runLater

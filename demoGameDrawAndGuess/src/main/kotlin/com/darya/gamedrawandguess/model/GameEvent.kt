@@ -34,11 +34,6 @@ sealed interface GameEvent {
     @Serializable @SerialName("remove_client")
     data class RemoveClient(val id: Int, val userName: String): GameEvent
 
-    @Serializable @SerialName("update_score")
+    @Serializable @SerialName("update_score")   // переимееновать в угада слово
     data class UpdateScore(val id: Int, val score: Int): GameEvent
-
-    @Serializable @SerialName("clear")
-    data object Clear : GameEvent
-
-
 }

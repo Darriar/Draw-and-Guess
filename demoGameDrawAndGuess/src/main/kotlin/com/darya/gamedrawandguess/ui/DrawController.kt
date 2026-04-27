@@ -13,6 +13,7 @@ import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.control.Button
 import javafx.scene.control.ColorPicker
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
@@ -54,6 +55,9 @@ class DrawController {
     private lateinit var toolsPane: VBox
     @FXML
     private lateinit var playersPane: VBox
+    @FXML
+    private lateinit var clearBtn: Button
+
 
     private lateinit var gc: GraphicsContext
     private var currentTool: ShapeType = ShapeType.PENCIL
@@ -66,6 +70,7 @@ class DrawController {
 
     @FXML
     fun initialize() {
+
         Init.initCanvas(gameCanvas, canvasContainer, drawingHistory)
         Init.initCanvas(tempCanvas, canvasContainer, drawingHistory)
         Init.initSizeSlider(sizeSlider)
@@ -84,7 +89,7 @@ class DrawController {
         val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas) ?: return false
 
         out = PrintWriter(socket.getOutputStream(), true)
-        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, { currentTool }, out)
+        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, clearBtn, { currentTool }, out, drawingHistory)
         return true
     }
 
@@ -164,13 +169,6 @@ class DrawController {
 
     fun addLineToDrawingHistory(line: GameEvent.DrawShape) {
         drawingHistory.add(line)
-    }
-
-    @FXML
-    fun clearCanvas() {
-        val event = GameEvent.Clear
-        out.println(Json.encodeToString<GameEvent>(event))
-        Drawing.clearCanvas(gameCanvas)
     }
 
     fun updateTimer(seconds: Int) {

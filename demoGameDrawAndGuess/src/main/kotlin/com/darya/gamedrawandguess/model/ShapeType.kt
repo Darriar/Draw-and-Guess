@@ -1,18 +1,17 @@
 package com.darya.gamedrawandguess.model
 
 enum class ShapeType(val label: String,
-                     val icon: String,
+                     val imagePath: String,
                      val isHandleDrawing: Boolean, // рисуется от руки сразу на gameCanvas
-                     val isFloodFill: Boolean) // заливка
+                     val isFloodFill: Boolean,
+                     val isAction: Boolean)
 {
-    PENCIL("Карандаш", "✏️",  true, false),
-    LINE("Линия", "➖",  false, false),
-    RECT("Прямоугольник", "⬛",  false, false),
-    OVAL("Овал", "⚪",  false, false),
-    FLOODFILL("Заливка", "🫗",  false, true),
-    ERASER("Ластик", "🧼", true, false);
+    PENCIL("Карандаш",  "/images/pencil.png",  true, false, false),
+    LINE("Линия",   "/images/line.png",false, false, false),
+    RECT("Прямоугольник",  "/images/rect.png", false, false, false),
+    OVAL("Овал",   "/images/oval.png",false, false, false),
+    FLOODFILL("Заливка",   "/images/floodfill.png",false, true, false),
+    ERASER("Ластик",  "/images/eraser.png",true, false, false),
 
-
-
-    override fun toString(): String = "$icon $label"
+    CLEAR("Очистить", "", false, false, true)
 }

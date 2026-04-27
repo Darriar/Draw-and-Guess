@@ -4,6 +4,7 @@ import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.model.ShapeType
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.control.Button
 import javafx.scene.control.ColorPicker
 import javafx.scene.control.Slider
 import javafx.scene.input.MouseEvent
@@ -23,7 +24,7 @@ object Drawing {
             drawShape(shape as GameEvent.DrawShape, canvas)
     }
 
-    fun setupDrawingEvents(gameCanvas: Canvas, tempCanvas: Canvas, colorPicker: ColorPicker, sizeSlider: Slider, shapeProvider: () -> ShapeType, out: PrintWriter) {
+    fun setupDrawingEvents(gameCanvas: Canvas, tempCanvas: Canvas, colorPicker: ColorPicker, sizeSlider: Slider, clearBtn: Button, shapeProvider: () -> ShapeType, out: PrintWriter, drawingHistory: MutableList<GameEvent>) {
         var startX = 0.0
         var startY = 0.0
 
@@ -50,6 +51,7 @@ object Drawing {
             }
 
             drawShape(shape, canvas)
+            if (!isPreview) drawingHistory.add(shape)
         }
 
         tempCanvas.setOnMousePressed { event ->
@@ -60,10 +62,11 @@ object Drawing {
             if (shapeType.isFloodFill) {
                 val fillShape = GameEvent.DrawShape(
                     ShapeType.FLOODFILL, startX, startY, startX, startY,
-                    colorPicker.value.toString(), sizeSlider.value, false
+                    colorPicker.value.toString(), 0.0, false
                 )
                 drawShape(fillShape, gameCanvas)
                 out.println(Json.encodeToString<GameEvent>(fillShape))
+                drawingHistory.add(fillShape)
             }
         }
 
@@ -77,6 +80,14 @@ object Drawing {
             createShape(event)
         }
 
+        clearBtn.setOnMousePressed {
+            clearCanvas(gameCanvas)
+            val clearShape = GameEvent.DrawShape(
+                ShapeType.CLEAR, 0.0, 0.0, 0.0, 0.0, Color.WHITE.toString(), 0.0, false
+            )
+            out.println(Json.encodeToString<GameEvent>(clearShape))
+            drawingHistory.add(clearShape)
+        }
     }
 
     fun drawShape(shape: GameEvent.DrawShape, canvas: Canvas) {
@@ -105,6 +116,9 @@ object Drawing {
             }
             ShapeType.FLOODFILL -> {
                 floodFill(x1, y1, shape.color, canvas)
+            }
+            ShapeType.CLEAR -> {
+                clearCanvas(canvas)
             }
         }
     }

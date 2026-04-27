@@ -14,8 +14,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="700.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1200.0" styleClass="root-pane" stylesheets="@draw_style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.DrawController">
+<BorderPane minHeight="700.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1200.0" styleClass="root-pane" stylesheets="@draw_style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.darya.gamedrawandguess.ui.DrawController">
 
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="20.0" />
@@ -84,12 +85,15 @@
                         <Separator orientation="VERTICAL" />
                         <VBox alignment="CENTER" spacing="5.0">
                             <children>
-                                <Label style="-fx-font-size: 11; -fx-text-fill: #888;" text="Размер кисти" />
-                                <Slider fx:id="sizeSlider" prefWidth="150.0" />
+                                <Label fx:id="brushSizeLabel" style="-fx-font-size: 11; -fx-text-fill: #888;" styleClass="brush-size-label" stylesheets="@draw_style.css" text="Размер кисти">
+                           <font>
+                              <Font size="40.0" />
+                           </font></Label>
+                                <Slider fx:id="sizeSlider" prefWidth="150.0" styleClass="modern-slider" stylesheets="@draw_style.css" />
                             </children>
                         </VBox>
                         <Separator orientation="VERTICAL" />
-                        <Button fx:id="clearBtn" onAction="#clearCanvas" styleClass="clear-btn" text="Очистить" />
+                        <Button fx:id="clearBtn"  styleClass="clear-btn" text="Очистить" />
                     </children>
                     <padding>
                         <Insets left="20.0" right="20.0" />

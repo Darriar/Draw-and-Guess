@@ -8,6 +8,9 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Button
 import javafx.scene.control.ColorPicker
 import javafx.scene.control.Slider
+import javafx.scene.control.Tooltip
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.StrokeLineCap
@@ -55,16 +58,28 @@ object Init {
     }
 
     fun initToolButtons(toolsVBox: VBox, onToolSelected: (ShapeType) -> Unit) {
-        val types = ShapeType.entries
+        val types = ShapeType.entries.filter { !it.isAction }
 
         for (type in types) {
-            val button = Button(type.toString()).apply {
+            val button = Button().apply {
                 maxWidth = Double.MAX_VALUE
-
                 styleClass.add("tool-button")
-                if (type == ShapeType.PENCIL) { // замени на свой дефолтный тип
+
+                tooltip = Tooltip(type.label)
+
+                if (type == ShapeType.PENCIL) {
                     styleClass.add("active-tool")
                 }
+
+                val stream = ShapeType::class.java.getResourceAsStream(type.imagePath)
+                if (stream != null) {
+                    graphic = ImageView(Image(stream)).apply {
+                        fitWidth = 30.0
+                        fitHeight = 30.0
+                        isPreserveRatio = true
+                    }
+                } else println("empty image ${type.label}")
+
 
                 setOnAction {
                     toolsVBox.children.filterIsInstance<Button>().forEach {
@@ -73,8 +88,8 @@ object Init {
                     styleClass.add("active-tool")
                     onToolSelected(type)
                 }
-            }
 
+            }
             toolsVBox.children.add(button)
         }
     }

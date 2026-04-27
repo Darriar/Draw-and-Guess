@@ -37,13 +37,9 @@ class ProcessEvent(private val controller: DrawController,
             chat.appendText("${chatEvent.message}\n")
         }
 
-        events[GameEvent.Clear::class] = {
-            Drawing.clearCanvas(gameCanvas)
-            Drawing.clearCanvas(tempCanvas)
-            controller.clearDrawingHistory()
-        }
-
         events[GameEvent.RoundStart::class] = { event ->
+            controller.clearDrawingHistory()
+            Drawing.clearCanvas(gameCanvas)
             val roundInfo = event as GameEvent.RoundStart
             controller.updateTimer(roundInfo.seconds)
 
