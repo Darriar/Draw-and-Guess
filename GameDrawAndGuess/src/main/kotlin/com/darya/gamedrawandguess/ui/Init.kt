@@ -1,7 +1,6 @@
 package com.darya.gamedrawandguess.ui
 
 import com.darya.gamedrawandguess.drawingpart.Drawing
-import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.model.ShapeType
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -18,7 +17,7 @@ import javafx.scene.shape.StrokeLineCap
 
 
 object Init {
-    fun initCanvas(gameCanvas: Canvas, tempCanvas: Canvas, canvasContainer: StackPane, drawingHistory: MutableList<GameEvent.DrawShape>) {
+    fun initCanvas(gameCanvas: Canvas, tempCanvas: Canvas, canvasContainer: StackPane) {
         gameCanvas.widthProperty().bind(canvasContainer.widthProperty())
         gameCanvas.heightProperty().bind(canvasContainer.heightProperty())
         tempCanvas.widthProperty().bind(canvasContainer.widthProperty())
@@ -27,8 +26,8 @@ object Init {
         canvasContainer.minWidth = 0.0
         canvasContainer.minHeight = 0.0
 
-        gameCanvas.widthProperty().addListener { _ -> Drawing.redraw(gameCanvas, drawingHistory) }
-        gameCanvas.heightProperty().addListener { _ -> Drawing.redraw(gameCanvas, drawingHistory) }
+        gameCanvas.widthProperty().addListener { _ -> Drawing.redraw(gameCanvas) }
+        gameCanvas.heightProperty().addListener { _ -> Drawing.redraw(gameCanvas) }
     }
 
     fun initSizeSlider(sizeSlider: Slider) {

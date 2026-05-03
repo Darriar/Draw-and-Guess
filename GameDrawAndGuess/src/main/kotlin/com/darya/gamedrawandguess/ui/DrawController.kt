@@ -70,13 +70,13 @@ class DrawController {
     private var timeLine: Timeline? = null
     private lateinit var serverConnection: ToServer
     private var playersInfo =  FXCollections.observableArrayList<PlayerInfo>()
-    private var drawingHistory = mutableListOf<GameEvent.DrawShape>()
-    private var redoStack = mutableListOf<GameEvent.DrawShape>()
+    //private var drawingHistory = mutableListOf<GameEvent.DrawShape>()
+    //private var redoStack = mutableListOf<GameEvent.DrawShape>()
 
     @FXML
     fun initialize() {
 
-        Init.initCanvas(gameCanvas, tempCanvas, canvasContainer, drawingHistory)
+        Init.initCanvas(gameCanvas, tempCanvas, canvasContainer)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
         Init.initToolButtons(toolsVBox, undoBtn, redoBtn) { selectedType ->  currentTool = selectedType}
@@ -93,7 +93,7 @@ class DrawController {
         val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas) ?: return false
 
         out = PrintWriter(socket.getOutputStream(), true)
-        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, clearBtn, undoBtn, redoBtn, { currentTool }, out, drawingHistory, redoStack)
+        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, clearBtn, undoBtn, redoBtn, { currentTool }, out)
         return true
     }
 
@@ -165,14 +165,6 @@ class DrawController {
 
     fun removePlayerInfo(id: Int) {
         playersInfo.removeIf { it.id == id }
-    }
-
-    fun clearDrawingHistory() {
-        drawingHistory.clear()
-    }
-
-    fun addLineToDrawingHistory(line: GameEvent.DrawShape) {
-        drawingHistory.add(line)
     }
 
     fun updateTimer(seconds: Int) {

@@ -18,7 +18,7 @@ class Server {
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
 
-    private val ROUND_TIME_IN_SECONDS = 100
+    private val ROUND_TIME_IN_SECONDS = 10
     private val MAX_NUMBER_OF_SCORES = 100
 
     @Volatile private var isGameStarted = false
@@ -145,7 +145,9 @@ class Server {
     private fun stopRound() {
         broadcast(GameEvent.RoundEnd(keyWord!!))
         keyWord = null
-        scheduler.schedule({ startRound() }, 3, TimeUnit.SECONDS)
+        currentRoundTask = scheduler.schedule({
+            startRound()
+        }, 3, TimeUnit.SECONDS)
     }
 
     fun stop() {

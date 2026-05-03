@@ -18,7 +18,10 @@ import kotlin.math.abs
 
 object Drawing {
 
-    fun redraw(canvas: Canvas, drawingHistory: MutableList<GameEvent.DrawShape>) {
+    private var drawingHistory = mutableListOf<GameEvent.DrawShape>()
+    private var redoStack = mutableListOf<GameEvent.DrawShape>()
+
+    fun redraw(canvas: Canvas) {
         clearCanvas(canvas)
         for (shape in drawingHistory)
             drawShape(shape, canvas)
@@ -26,8 +29,7 @@ object Drawing {
 
     fun setupDrawingEvents(gameCanvas: Canvas, tempCanvas: Canvas, colorPicker: ColorPicker, sizeSlider: Slider,
                            clearBtn: Button, undoBtn: Button, redoBtn: Button,
-                           shapeProvider: () -> ShapeType, out: PrintWriter,
-                           drawingHistory: MutableList<GameEvent.DrawShape>, redoStack: MutableList<GameEvent.DrawShape>) {
+                           shapeProvider: () -> ShapeType, out: PrintWriter) {
         var startX = 0.0
         var startY = 0.0
         val tempLineCoords: MutableList<GameEvent.Point> = mutableListOf()
@@ -104,14 +106,14 @@ object Drawing {
 
         undoBtn.setOnMousePressed {
             val undoAction = GameEvent.DrawShape(ShapeType.UNDO)
-            undo(redoStack, drawingHistory, gameCanvas)
+            undo(gameCanvas)
             out.println(Json.encodeToString<GameEvent>(undoAction))
         }
 
         redoBtn.setOnMousePressed {
             val redoAction = GameEvent.DrawShape(ShapeType.REDO)
             out.println(Json.encodeToString(redoAction))
-            redo(redoStack, drawingHistory, gameCanvas)
+            redo(gameCanvas)
         }
     }
 
@@ -155,7 +157,12 @@ object Drawing {
             ShapeType.CLEAR -> {
                 clearCanvas(canvas)
             }
-            ShapeType.UNDO, ShapeType.REDO -> {}
+            ShapeType.UNDO -> {
+                undo(canvas)
+            }
+            ShapeType.REDO -> {
+                redo(canvas)
+            }
         }
     }
 
@@ -213,20 +220,28 @@ object Drawing {
         canvas.graphicsContext2D.clearRect(0.0, 0.0, canvas.width, canvas.height)
     }
 
-    private fun undo(redoStack: MutableList<GameEvent.DrawShape>, drawingHistory: MutableList<GameEvent.DrawShape>, gameCanvas: Canvas) {
+    private fun undo(gameCanvas: Canvas) {
         if (drawingHistory.isNotEmpty()) {
             val move = drawingHistory.removeLast()
             redoStack.add(move)
-            redraw(gameCanvas, drawingHistory)
+            redraw(gameCanvas)
         }
     }
 
-    private fun redo(redoStack: MutableList<GameEvent.DrawShape>, drawingHistory: MutableList<GameEvent.DrawShape>, gameCanvas: Canvas) {
+    private fun redo(gameCanvas: Canvas) {
         if (redoStack.isNotEmpty()) {
             val move = redoStack.removeLast()
             drawingHistory.add(move)
-            redraw(gameCanvas, drawingHistory) // или просто рисовать на существующем рисунке
+            drawShape(move, gameCanvas)
         }
     }
 
+    fun clearDrawingHistory() {
+        drawingHistory.clear()
+        redoStack.clear()
+    }
+
+    fun addLineToDrawingHistory(line: GameEvent.DrawShape) {
+        drawingHistory.add(line)
+    }
 }

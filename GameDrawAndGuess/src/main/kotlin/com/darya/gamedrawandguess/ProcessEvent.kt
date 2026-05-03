@@ -28,7 +28,7 @@ class ProcessEvent(private val controller: DrawController,
                 Drawing.drawShape(drawEvent, tempCanvas)
             } else {
                 Drawing.drawShape(drawEvent, gameCanvas)
-                controller.addLineToDrawingHistory(drawEvent)
+                Drawing.addLineToDrawingHistory(drawEvent)
             }
         }
 
@@ -38,7 +38,7 @@ class ProcessEvent(private val controller: DrawController,
         }
 
         events[GameEvent.RoundStart::class] = { event ->
-            controller.clearDrawingHistory()
+            Drawing.clearDrawingHistory()
             Drawing.clearCanvas(gameCanvas)
             val roundInfo = event as GameEvent.RoundStart
             controller.updateTimer(roundInfo.seconds)
