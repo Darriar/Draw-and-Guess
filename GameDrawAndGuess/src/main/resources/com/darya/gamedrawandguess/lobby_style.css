@@ -1,0 +1,115 @@
+/* --- 1. ОБЩИЕ НАСТРОЙКИ --- */
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", sans-serif;
+}
+
+.root-pane {
+    /* Градиентный фон из ваших стилей */
+    -fx-background-color: linear-gradient(to bottom right, #f0f4f8, #d9e2ec);
+}
+
+/* --- 2. ГЛАВНЫЙ КОНТЕЙНЕР (КАРТОЧКА) --- */
+.main-container {
+    -fx-background-color: rgba(255, 255, 255, 0.8); /* Чуть более плотный белый */
+    -fx-background-radius: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 20, 0, 0, 10);
+}
+
+.title-label {
+    -fx-font-size: 32px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #243b53;
+    -fx-padding: 0 0 10 0;
+}
+
+/* --- 3. РАМКА СПИСКА КОМНАТ --- */
+/* Настройка самого ScrollPane */
+.no-border-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.no-border-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Стилизация внутренней рамки (VBox), где лежат кнопки */
+.rooms-vbox {
+    /* Фон рамки: светло-серый, чтобы отделить от белой карточки */
+    -fx-background-color: #f0f2f5;
+    -fx-background-radius: 15;
+
+    /* Сама рамка */
+    -fx-border-color: #e4e6eb;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 15;
+}
+
+/* Кастомный скроллбар для списка комнат */
+.no-border-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-width: 6px;
+}
+
+.no-border-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #bcc0c4;
+    -fx-background-radius: 10;
+}
+
+/* --- 4. КНОПКИ ДОСТУПНЫХ КОМНАТ --- */
+.rooms-vbox .button {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-padding: 12 20;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-text-fill: #334e68;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 5, 0, 0, 2);
+}
+
+.rooms-vbox .button:hover {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #4cc355; /* Ваш фирменный зеленый */
+    -fx-text-fill: #2c3e50;
+    -fx-effect: dropshadow(three-pass-box, rgba(76, 195, 85, 0.2), 10, 0, 0, 0);
+}
+
+.rooms-vbox .button:pressed {
+    -fx-background-color: #edf7ee;
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* --- 5. НИЖНЯЯ ПАНЕЛЬ И КНОПКА СОЗДАНИЯ --- */
+.separator {
+    -fx-background-color: #e4e6eb;
+}
+
+.main-button {
+    -fx-background-color: #486581; /* Темно-синий основной цвет */
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 15;
+    -fx-padding: 15 40;
+    -fx-cursor: hand;
+    -fx-text-transform: uppercase;
+    -fx-letter-spacing: 0.5px;
+}
+
+.main-button:hover {
+    -fx-background-color: #334e68;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 10, 0, 0, 3);
+}
+
+.main-button:pressed {
+    -fx-background-color: #243b53;
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+}

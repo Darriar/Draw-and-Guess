@@ -56,7 +56,7 @@ object Drawing {
                 points = tempLineCoords.toMutableList()
             }
 
-            val shape = GameEvent.DrawShape(shapeType,points, color.toString(), sizeSlider.value, isPreview)
+            val shape = GameEvent.DrawShape(shapeType, points, color.toString(), sizeSlider.value, isPreview)
 
             val jsonMessage = Json.encodeToString<GameEvent>(shape)
             out.println(jsonMessage)
@@ -112,7 +112,7 @@ object Drawing {
 
         redoBtn.setOnMousePressed {
             val redoAction = GameEvent.DrawShape(ShapeType.REDO)
-            out.println(Json.encodeToString(redoAction))
+            out.println(Json.encodeToString<GameEvent>(redoAction))
             redo(gameCanvas)
         }
     }

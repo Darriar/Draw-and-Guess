@@ -20,27 +20,19 @@ class WelcomeController {
     fun onStartBtnClick() {
         val userName = inputNameText.text
         if (userName.trim().isNotEmpty()) {
-            val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("draw-view.fxml"))
+            val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("lobby-view.fxml"))
             val mainRoot = fxmlLoader.load<Parent>()
+            val stage = startBtn.scene.window as Stage
+            stage.scene = Scene(mainRoot)
 
-            val drawController = fxmlLoader.getController<DrawController>()
-
-            val isConnected = drawController.attemptConnection()
-
-            if (isConnected) {
-                drawController.setUserName(userName) // Теперь out точно инициализирован
-                val stage = startBtn.scene.window as Stage
-                stage.scene = Scene(mainRoot)
-            } else {
-                createAlert(Alert.AlertType.ERROR, "Ошибка сети",
-                    "Не удалось подключиться к серверу", "Проверьте, запущен ли сервер.")
-            }
+            val lobbyController = fxmlLoader.getController<LobbyController>()
+            lobbyController.setUserName(userName)
         } else {
             createAlert(Alert.AlertType.INFORMATION, "Ошибка ввода имени игрока!", "Пустое имя", "Введите имя игрока!")
         }
     }
 
-    private fun createAlert(type: Alert.AlertType, titleA: String, headerA: String, contentA: String): Alert {
+    fun createAlert(type: Alert.AlertType, titleA: String, headerA: String, contentA: String): Alert {
         return  Alert(type).apply {
             title = titleA
             headerText = headerA

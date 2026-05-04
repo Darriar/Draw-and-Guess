@@ -39,7 +39,9 @@ class Server {
         clients.forEach { client ->
             if (client != sender || event is GameEvent.Chat) {
                 client.sendEvent(event)
-                println("send + $event")
+                if (event !is GameEvent.DrawShape) {
+                    println(event)
+                }
             }
         }
 
@@ -150,13 +152,17 @@ class Server {
         }, 3, TimeUnit.SECONDS)
     }
 
+
+    @Synchronized
     fun stop() {
-        println("Остановка сервера...")
+        broadcast(GameEvent.Chat("Сервер закрывается..."))
+
         isGameStarted = false
-        currentRoundTask?.cancel(true)
         scheduler.shutdownNow()
 
-        clients.forEach { it.closeConnection() }
+        clients.forEach {
+            it.closeConnection()
+        }
         clients.clear()
     }
 }
@@ -166,7 +172,6 @@ class Server {
 fun main() {
     val server = Server()
     val serverSocket = java.net.ServerSocket(8080)
-   // val serverSocket = java.net.ServerSocket(8080, 50, java.net.InetAddress.getByName("0.0.0.0"))
     println("Сервер запущен на порту 8080...")
 
     Runtime.getRuntime().addShutdownHook(Thread {

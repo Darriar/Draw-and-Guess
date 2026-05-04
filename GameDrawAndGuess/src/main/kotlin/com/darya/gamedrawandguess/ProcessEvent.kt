@@ -40,6 +40,7 @@ class ProcessEvent(private val controller: DrawController,
         events[GameEvent.RoundStart::class] = { event ->
             Drawing.clearDrawingHistory()
             Drawing.clearCanvas(gameCanvas)
+            Drawing.clearCanvas(tempCanvas)
             val roundInfo = event as GameEvent.RoundStart
             controller.updateTimer(roundInfo.seconds)
 

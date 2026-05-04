@@ -11,14 +11,9 @@ import java.util.*
 class ToServer(private val controller: DrawController) {
     private var socket: Socket? = null
 
-    fun connect(chat: TextArea, gameCanvas: Canvas, tempCanvas: Canvas): Socket? {
+    fun connect(chat: TextArea, gameCanvas: Canvas, tempCanvas: Canvas, ip: String, port: Int): Socket? {
         try {
-            val localhost = InetAddress.getLocalHost().hostAddress
-            println(localhost)
-            //val host = "147.185.221.18" //"clear-puzzle.gl.joinmc.link"
-            //val port = 25565
-            //socket = Socket(host, port)
-            socket = Socket("localhost", 8080)     // 10.177.142.105    192.168.100.11
+            socket = Socket(ip, port)     // 10.177.142.105    192.168.100.11
             startListening(chat, gameCanvas, tempCanvas)
             chat.appendText("Вы подключены к серверу!\n")
             return socket
@@ -46,6 +41,13 @@ class ToServer(private val controller: DrawController) {
                 Platform.runLater {
                     chat.appendText("Соединение разорвано.\n")
                 }
+            } finally {
+                Platform.runLater {
+                    chat.appendText("Соединение с сервером потеряно.\n")
+                    controller.onDisconnect() // Вызываем метод в контроллере
+                }
+                socket?.close()
+                socket = null
             }
         }.start()
     }

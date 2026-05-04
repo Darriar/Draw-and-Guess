@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane fx:id="rootPane" minHeight="700.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1200.0"
+           styleClass="root-pane" stylesheets="@lobby_style.css"
+           xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.darya.gamedrawandguess.ui.LobbyController">
+   <children>
+      <!-- Основная карточка центра -->
+      <VBox alignment="CENTER" maxHeight="650.0" maxWidth="800.0" spacing="20.0" styleClass="main-container">
+         <children>
+            <Label styleClass="title-label" text="Доступные комнаты" />
+
+            <!-- Список комнат в скролле, чтобы не вылезали за края -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="no-border-scroll">
+               <content>
+                  <VBox fx:id="lobbyVBox" spacing="12.0" styleClass="rooms-vbox">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </ScrollPane>
+
+            <Separator opacity="0.5" />
+
+            <!-- Кнопка создания всегда снизу -->
+            <Button fx:id="createLobbyBtn" mnemonicParsing="false" onAction="#onCreateLobbyClick"
+                    styleClass="main-button" text="Создать новую комнату" prefWidth="300.0" />
+         </children>
+         <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+         </padding>
+      </VBox>
+   </children>
+</StackPane>

@@ -1,5 +1,6 @@
 package com.darya.gamedrawandguess.ui
 
+import com.darya.gamedrawandguess.DrawApplication
 import com.darya.gamedrawandguess.drawingpart.Drawing
 import com.darya.gamedrawandguess.ToServer
 import com.darya.gamedrawandguess.model.GameEvent
@@ -10,18 +11,17 @@ import javafx.animation.Timeline
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
+import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.control.Button
-import javafx.scene.control.ColorPicker
-import javafx.scene.control.Label
-import javafx.scene.control.Slider
-import javafx.scene.control.TextArea
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
+import javafx.stage.Stage
 import javafx.util.Duration
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -70,8 +70,6 @@ class DrawController {
     private var timeLine: Timeline? = null
     private lateinit var serverConnection: ToServer
     private var playersInfo =  FXCollections.observableArrayList<PlayerInfo>()
-    //private var drawingHistory = mutableListOf<GameEvent.DrawShape>()
-    //private var redoStack = mutableListOf<GameEvent.DrawShape>()
 
     @FXML
     fun initialize() {
@@ -88,9 +86,9 @@ class DrawController {
         })
     }
 
-    fun attemptConnection(): Boolean {
+    fun attemptConnection(ip: String, port: Int): Boolean {
         serverConnection = ToServer(this)
-        val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas) ?: return false
+        val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas, ip, port) ?: return false
 
         out = PrintWriter(socket.getOutputStream(), true)
         Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, clearBtn, undoBtn, redoBtn, { currentTool }, out)
@@ -189,6 +187,10 @@ class DrawController {
 
     fun blockCanvas() {
         tempCanvas.disableProperty().set(true)
+        toolsPane.isVisible = false
+        playersPane.isVisible = true
+        playersPane.isManaged = true
+        bottomHBox.isVisible = false
     }
 
     fun setDrawingMode(isPainterMode: Boolean) {
@@ -201,7 +203,21 @@ class DrawController {
 
         playersPane.isVisible = !isPainterMode
         playersPane.isManaged = !isPainterMode
+    }
 
+    fun onDisconnect() {
+        gameCanvas.isDisable = true
+
+        val alert = Alert(Alert.AlertType.ERROR)
+        alert.title = "Связь потеряна"
+        alert.headerText = "Сервер отключился"
+        alert.contentText = "Вы будете возвращены в лобби."
+        alert.showAndWait()
+
+        val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("lobby-view.fxml"))
+        val root = fxmlLoader.load<Parent>()
+        val stage = gameCanvas.scene.window as Stage
+        stage.scene = Scene(root)
     }
 
 }
