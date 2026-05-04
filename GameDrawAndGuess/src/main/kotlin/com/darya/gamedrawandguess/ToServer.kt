@@ -4,7 +4,6 @@ import com.darya.gamedrawandguess.ui.DrawController
 import javafx.application.Platform
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.TextArea
-import java.net.InetAddress
 import java.net.Socket
 import java.util.*
 

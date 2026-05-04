@@ -27,41 +27,24 @@ class DrawApplication : Application() {
     override fun stop() {
         exitProcess(0)
     }
+
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            launch(DrawApplication::class.java, *args)
+        }
+    }
 }
 
-fun main() {
+/*fun main() {
     Application.launch(DrawApplication::class.java)
-}
+}*/
+
 
 // конец  раунда и таймер пошел раньше чем слово сменилось (надпись раньше таймера)
 // разораться почему баги с переходами раундов
-
-// если сервер отключился отключать всех
-// сети зайти в комнату создать показывать доступные создать порт занимать (как обрабатывать отключение сервера)
+// чтобы при входе видел всю историю нарисованного
 
 // сделать красивые алерты
 
 // runLater
-
-/*
-     <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.darya.gamedrawandguess.DrawApplicationKt</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
- */

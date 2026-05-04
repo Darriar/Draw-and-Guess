@@ -62,7 +62,6 @@
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
-            <!-- Java Compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -73,7 +72,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Kotlin Compiler with Serialization Plugin -->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -82,16 +80,7 @@
                     <execution>
                         <id>compile</id>
                         <phase>process-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
+                        <goals> <goal>compile</goal> </goals>
                     </execution>
                 </executions>
                 <configuration>
@@ -109,26 +98,6 @@
                 </dependencies>
             </plugin>
 
-            <!-- JavaFX Maven Plugin -->
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <executions>
-                    <execution>
-                        <id>default-cli</id>
-                        <configuration>
-                            <mainClass>com.darya.gamedrawandguess/com.darya.gamedrawandguess.HelloApplication</mainClass>
-                            <launcher>app</launcher>
-                            <jlinkZipName>app</jlinkZipName>
-                            <jlinkImageName>app</jlinkImageName>
-                            <noManPages>true</noManPages>
-                            <stripDebug>true</stripDebug>
-                            <noHeaderFiles>true</noHeaderFiles>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -140,10 +109,30 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <!-- Исключаем дубликаты манифестов и подписей библиотек -->
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <!-- Исключаем module-info из зависимостей, чтобы они не конфликтовали с вашим -->
+                                        <exclude>module-info.class</exclude>
+                                        <exclude>META-INF/versions/9/module-info.class</exclude>
+                                        <!-- Убираем лишние конфиги JavaFX для мобильных платформ -->
+                                        <exclude>META-INF/substrate/config/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <transformers>
+                                <!-- Этот трансформер объединяет все MANIFEST.MF в один правильный -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.darya.gamedrawandguess.DrawApplicationKt</mainClass>
+                                    <mainClass>com.darya.gamedrawandguess.Launcher</mainClass>
                                 </transformer>
+                                <!-- Объединяет служебные файлы (важно для работы библиотек) -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                         </configuration>
                     </execution>

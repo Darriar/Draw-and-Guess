@@ -21,6 +21,7 @@ object Drawing {
     private var drawingHistory = mutableListOf<GameEvent.DrawShape>()
     private var redoStack = mutableListOf<GameEvent.DrawShape>()
 
+    @Synchronized
     fun redraw(canvas: Canvas) {
         clearCanvas(canvas)
         for (shape in drawingHistory)
@@ -62,10 +63,11 @@ object Drawing {
             out.println(jsonMessage)
 
             drawShape(shape, canvas)
-            if (!isPreview)  {
-                drawingHistory.add(shape)
+            if (!isPreview && shapeType.isHandleDrawing)  {
                 tempLineCoords.clear()
             }
+            if (!isPreview)
+                addShapeToDrawingHistory(shape)
         }
 
         tempCanvas.setOnMousePressed { event ->
@@ -80,8 +82,8 @@ object Drawing {
                     colorPicker.value.toString(), 0.0, false
                 )
                 drawShape(fillShape, gameCanvas)
+                addShapeToDrawingHistory(fillShape)
                 out.println(Json.encodeToString<GameEvent>(fillShape))
-                drawingHistory.add(fillShape)
             }
         }
 
@@ -96,12 +98,12 @@ object Drawing {
         }
 
         clearBtn.setOnMousePressed {
-            clearCanvas(gameCanvas)
             val clearShape = GameEvent.DrawShape(
                 ShapeType.CLEAR, listOf(), Color.WHITE.toString(), 0.0, false
             )
+            drawShape(clearShape, gameCanvas)
+            addShapeToDrawingHistory(clearShape)
             out.println(Json.encodeToString<GameEvent>(clearShape))
-            drawingHistory.add(clearShape)
         }
 
         undoBtn.setOnMousePressed {
@@ -231,8 +233,8 @@ object Drawing {
     private fun redo(gameCanvas: Canvas) {
         if (redoStack.isNotEmpty()) {
             val move = redoStack.removeLast()
-            drawingHistory.add(move)
             drawShape(move, gameCanvas)
+            addShapeToDrawingHistory(move)
         }
     }
 
@@ -241,7 +243,7 @@ object Drawing {
         redoStack.clear()
     }
 
-    fun addLineToDrawingHistory(line: GameEvent.DrawShape) {
-        drawingHistory.add(line)
+    fun addShapeToDrawingHistory(shape: GameEvent.DrawShape) {
+        drawingHistory.add(shape)
     }
 }

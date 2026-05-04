@@ -18,7 +18,7 @@ class Server {
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
 
-    private val ROUND_TIME_IN_SECONDS = 10
+    private val ROUND_TIME_IN_SECONDS = 200
     private val MAX_NUMBER_OF_SCORES = 100
 
     @Volatile private var isGameStarted = false
@@ -28,6 +28,7 @@ class Server {
     private var roundStartTime: Long = 0
 
     private val drawingHistory = CopyOnWriteArrayList<GameEvent>()
+    private val redoStack = CopyOnWriteArrayList<GameEvent>()
 
     @Synchronized
     private fun broadcast(event: GameEvent, sender: ClientHandler? = null) {

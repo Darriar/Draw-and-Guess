@@ -2,6 +2,7 @@ package com.darya.gamedrawandguess
 
 import com.darya.gamedrawandguess.drawingpart.Drawing
 import com.darya.gamedrawandguess.model.GameEvent
+import com.darya.gamedrawandguess.model.ShapeType
 import com.darya.gamedrawandguess.ui.DrawController
 import javafx.application.Platform
 import javafx.scene.canvas.Canvas
@@ -28,7 +29,8 @@ class ProcessEvent(private val controller: DrawController,
                 Drawing.drawShape(drawEvent, tempCanvas)
             } else {
                 Drawing.drawShape(drawEvent, gameCanvas)
-                Drawing.addLineToDrawingHistory(drawEvent)
+                if (drawEvent.shapeType != ShapeType.UNDO && drawEvent.shapeType != ShapeType.REDO)
+                Drawing.addShapeToDrawingHistory(drawEvent)
             }
         }
 
