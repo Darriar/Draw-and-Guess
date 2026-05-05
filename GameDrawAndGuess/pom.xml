@@ -114,6 +114,14 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>META-INF/LICENSE*</exclude>
+                                        <exclude>META-INF/NOTICE*</exclude>
+                                        <exclude>META-INF/kotlin-stdlib.kotlin_module</exclude>
+                                        <exclude>META-INF/kotlinx-serialization-json.kotlin_module</exclude>
+                                        <!-- Часто прилетает из сторонних библиотек -->
+                                        <exclude>**/pom.properties</exclude>
+                                        <exclude>**/pom.xml</exclude>
                                         <!-- Исключаем дубликаты манифестов и подписей библиотек -->
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>

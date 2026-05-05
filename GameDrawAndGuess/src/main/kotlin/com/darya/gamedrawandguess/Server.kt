@@ -18,7 +18,7 @@ class Server {
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
     private var currentRoundTask: ScheduledFuture<*>? = null
 
-    private val ROUND_TIME_IN_SECONDS = 200
+    private val ROUND_TIME_IN_SECONDS = 50
     private val MAX_NUMBER_OF_SCORES = 100
 
     @Volatile private var isGameStarted = false
@@ -28,7 +28,6 @@ class Server {
     private var roundStartTime: Long = 0
 
     private val drawingHistory = CopyOnWriteArrayList<GameEvent>()
-    private val redoStack = CopyOnWriteArrayList<GameEvent>()
 
     @Synchronized
     private fun broadcast(event: GameEvent, sender: ClientHandler? = null) {
@@ -40,9 +39,6 @@ class Server {
         clients.forEach { client ->
             if (client != sender || event is GameEvent.Chat) {
                 client.sendEvent(event)
-                if (event !is GameEvent.DrawShape) {
-                    println(event)
-                }
             }
         }
 
@@ -76,8 +72,11 @@ class Server {
 
     @Synchronized
     fun addClient(client: ClientHandler) {
-        drawingHistory.forEach { client.sendEvent(it) }
         clients.forEach { client.sendEvent(GameEvent.AddClient(it.id, it.userName, it.score)) }
+        /*for (shape in drawingHistory) {
+            client.sendEvent(shape)
+        }*/
+
 
         clients.add(client)
         broadcast(GameEvent.AddClient(client.id, client.userName, client.score))
@@ -89,6 +88,7 @@ class Server {
             val leftTime = (ROUND_TIME_IN_SECONDS - (System.currentTimeMillis() - roundStartTime) / 1000).toInt()
             client.sendEvent(GameEvent.RoundStart(currentPainter!!.userName, leftTime, null))
         }
+        drawingHistory.forEach { client.sendEvent(it) }
     }
 
     @Synchronized

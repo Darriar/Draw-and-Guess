@@ -5,7 +5,7 @@
 
 <StackPane fx:id="rootPane" minHeight="700.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1200.0"
            styleClass="root-pane" stylesheets="@lobby_style.css"
-           xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+           xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.darya.gamedrawandguess.ui.LobbyController">
    <children>
       <!-- Основная карточка центра -->
