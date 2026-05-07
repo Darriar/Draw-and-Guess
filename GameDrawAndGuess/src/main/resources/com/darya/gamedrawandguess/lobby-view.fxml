@@ -4,7 +4,7 @@
 <?import javafx.geometry.Insets?>
 
 <StackPane fx:id="rootPane" minHeight="700.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1200.0"
-           styleClass="root-pane" stylesheets="@lobby_style.css"
+           styleClass="root-pane" stylesheets="@../../../styles/lobby-style.css"
            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.darya.gamedrawandguess.client.ui.LobbyController">
    <children>

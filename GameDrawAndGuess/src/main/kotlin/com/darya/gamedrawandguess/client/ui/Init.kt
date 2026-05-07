@@ -84,7 +84,6 @@ object Init {
         button.styleClass.add("tool-button")
         button.tooltip = Tooltip(type.label)
 
-        // Загрузка иконки
         val stream = ShapeType::class.java.getResourceAsStream(type.imagePath)
         if (stream != null) {
             button.graphic = ImageView(Image(stream)).apply {

@@ -17,7 +17,6 @@ class GameClient(private val controller: DrawController) {
         try {
            socket = Socket(ip, port)
            out = PrintWriter(socket!!.getOutputStream(), true)
-           // sendEvent(GameEvent.Chat("Вы подкличились к игре\n"))
             startListening(eventHandler)
             return true
         } catch (e: Exception) {
