@@ -17,7 +17,9 @@ class ClientHandler(private val socket: Socket, private val server: Server): Thr
     override fun run() {
         try {
             val input = Scanner(socket.getInputStream())
-            userName = input.nextLine()
+            val nameEvent = Json.decodeFromString<GameEvent>(input.nextLine()) as GameEvent.AddClient
+            userName = nameEvent.userName
+
             server.addClient(this)
             println("Игрок $userName подключился!")
 

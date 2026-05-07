@@ -3,7 +3,6 @@ package com.darya.gamedrawandguess
 import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.model.ShapeType
 import com.darya.gamedrawandguess.util.FileManager
-import javafx.scene.paint.Color
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -108,21 +107,20 @@ class Server {
     }
 
     private fun startRound() {
-        roundStartTime = System.currentTimeMillis()
-
-        val startCoords = List(2) {GameEvent.Point(0.0, 0.0)}
-        broadcast(GameEvent.DrawShape(ShapeType.CLEAR, startCoords, Color.WHITE.toString(), 0.0,false))
-        drawingHistory.clear()
         if (clients.isEmpty()) {
             isGameStarted = false
             return
         }
 
+        roundStartTime = System.currentTimeMillis()
+
+        broadcast(GameEvent.DrawShape(ShapeType.CLEAR))
+        drawingHistory.clear()
+
         currentRoundTask?.cancel(false)
 
         currentPainter = setPainter()
         keyWord = fileManager.getNextWord()
-
 
         clients.forEach { client ->
             client.isGuess = false
@@ -183,7 +181,6 @@ fun main() {
         while (true) {
             val socket = serverSocket.accept()
             val handler = ClientHandler(socket, server)
-
             handler.start()
         }
     }catch (e: Exception) {

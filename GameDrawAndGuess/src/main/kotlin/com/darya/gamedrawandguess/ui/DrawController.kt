@@ -2,14 +2,14 @@ package com.darya.gamedrawandguess.ui
 
 import com.darya.gamedrawandguess.DrawApplication
 import com.darya.gamedrawandguess.drawingpart.Drawing
-import com.darya.gamedrawandguess.ToServer
+import com.darya.gamedrawandguess.GameClient
+import com.darya.gamedrawandguess.ProcessEvent
 import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.model.PlayerInfo
 import com.darya.gamedrawandguess.model.ShapeType
 import com.darya.gamedrawandguess.util.UIUtils
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
-import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.fxml.FXML
@@ -67,11 +67,11 @@ class DrawController {
 
     private lateinit var gc: GraphicsContext
     private var currentTool: ShapeType = ShapeType.PENCIL
-    private lateinit var out: PrintWriter
     private var userName: String = ""
     private var timeLine: Timeline? = null
-    private lateinit var serverConnection: ToServer
+    private lateinit var serverConnection: GameClient
     private var playersInfo =  FXCollections.observableArrayList<PlayerInfo>()
+    private var gameClient: GameClient? = null
 
     @FXML
     fun initialize() {
@@ -88,17 +88,18 @@ class DrawController {
     }
 
     fun attemptConnection(ip: String, port: Int): Boolean {
-        serverConnection = ToServer(this)
-        val socket = serverConnection.connect(chatTextArea, gameCanvas, tempCanvas, ip, port) ?: return false
+        gameClient = GameClient(this)
+        val eventHandler = ProcessEvent(this, chatTextArea, gameCanvas, tempCanvas)
+        if (!gameClient!!.connect(ip, port, eventHandler)) return false
 
-        out = PrintWriter(socket.getOutputStream(), true)
-        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, clearBtn, undoBtn, redoBtn, { currentTool }, out)
+        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, clearBtn, undoBtn, redoBtn, { currentTool }, {event -> gameClient?.sendEvent(event) })
         return true
     }
 
     fun setUserName(name: String) {
         userName = name
-        out.println(userName)
+        val joinEvent = GameEvent.AddClient(id = 0, userName = userName, score = 0)
+        gameClient?.sendEvent(joinEvent)
     }
 
     fun setCurrentPainter(name: String) {
@@ -114,7 +115,7 @@ class DrawController {
         val text =messageTextField.text
         if (text.isNotEmpty()) {
             val message: GameEvent = GameEvent.Chat("$userName: $text")
-            out.println(Json.encodeToString(message))
+            gameClient?.sendEvent(message)
             messageTextField.clear()
         }
     }

@@ -36,8 +36,7 @@ class LobbyController {
             try {
                 socket = DatagramSocket(null).apply {
                     reuseAddress = true
-                    bind(InetSocketAddress("0.0.0.0", 8888))
-                    //bind(InetSocketAddress(8888))
+                    bind(InetSocketAddress(8888))
                 }
                 val buffer = ByteArray(1024)
                 println("Поиск комнат запущен на порту 8888...")

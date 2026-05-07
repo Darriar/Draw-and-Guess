@@ -10,9 +10,6 @@ import javafx.scene.control.Slider
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.scene.shape.StrokeLineCap
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.io.PrintWriter
 import kotlin.collections.ArrayDeque
 import kotlin.math.abs
 
@@ -30,7 +27,7 @@ object Drawing {
 
     fun setupDrawingEvents(gameCanvas: Canvas, tempCanvas: Canvas, colorPicker: ColorPicker, sizeSlider: Slider,
                            clearBtn: Button, undoBtn: Button, redoBtn: Button,
-                           shapeProvider: () -> ShapeType, out: PrintWriter) {
+                           shapeProvider: () -> ShapeType, eventSender: (GameEvent) -> Unit) {
         var startX = 0.0
         var startY = 0.0
         val tempLineCoords: MutableList<GameEvent.Point> = mutableListOf()
@@ -59,8 +56,7 @@ object Drawing {
 
             val shape = GameEvent.DrawShape(shapeType, points, color.toString(), sizeSlider.value, isPreview)
 
-            val jsonMessage = Json.encodeToString<GameEvent>(shape)
-            out.println(jsonMessage)
+            eventSender(shape)
 
             drawShape(shape, canvas)
             if (!isPreview && shapeType.isHandleDrawing)  {
@@ -83,7 +79,7 @@ object Drawing {
                 )
                 drawShape(fillShape, gameCanvas)
                 addShapeToDrawingHistory(fillShape)
-                out.println(Json.encodeToString<GameEvent>(fillShape))
+                eventSender(fillShape)
             }
         }
 
@@ -103,19 +99,19 @@ object Drawing {
             )
             drawShape(clearShape, gameCanvas)
             addShapeToDrawingHistory(clearShape)
-            out.println(Json.encodeToString<GameEvent>(clearShape))
+            eventSender(clearShape)
         }
 
         undoBtn.setOnMousePressed {
             val undoAction = GameEvent.DrawShape(ShapeType.UNDO)
             undo(gameCanvas)
-            out.println(Json.encodeToString<GameEvent>(undoAction))
+            eventSender(undoAction)
         }
 
         redoBtn.setOnMousePressed {
             val redoAction = GameEvent.DrawShape(ShapeType.REDO)
-            out.println(Json.encodeToString<GameEvent>(redoAction))
             redo(gameCanvas)
+            eventSender(redoAction)
         }
     }
 
@@ -153,18 +149,10 @@ object Drawing {
                     y1 = point.y
                 }
             }
-            ShapeType.FLOODFILL -> {
-                floodFill(x1, y1, shape.color, canvas)
-            }
-            ShapeType.CLEAR -> {
-                clearCanvas(canvas)
-            }
-            ShapeType.UNDO -> {
-                undo(canvas)
-            }
-            ShapeType.REDO -> {
-                redo(canvas)
-            }
+            ShapeType.FLOODFILL -> { floodFill(x1, y1, shape.color, canvas) }
+            ShapeType.CLEAR -> { clearCanvas(canvas) }
+            ShapeType.UNDO -> { undo(canvas) }
+            ShapeType.REDO -> { redo(canvas) }
         }
     }
 
