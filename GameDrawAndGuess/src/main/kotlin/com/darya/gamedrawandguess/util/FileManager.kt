@@ -7,7 +7,7 @@ object FileManager {
         readWordsFromFile()
     }
     private fun readWordsFromFile() {
-        val path = "/com/darya/gamedrawandguess/words/words.txt"
+        val path = "/words/words.txt"
         val inputStream = this::class.java.getResourceAsStream(path)
         val lines = inputStream?.bufferedReader()?.use { it.readLines() } ?: emptyList()
 

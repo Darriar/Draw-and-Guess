@@ -245,5 +245,6 @@ object Drawing {
 
     fun addShapeToDrawingHistory(shape: GameEvent.DrawShape) {
         drawingHistory.add(shape)
+        redoStack.clear()
     }
 }

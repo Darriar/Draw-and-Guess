@@ -6,6 +6,7 @@ import com.darya.gamedrawandguess.ToServer
 import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.model.PlayerInfo
 import com.darya.gamedrawandguess.model.ShapeType
+import com.darya.gamedrawandguess.util.UIUtils
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.application.Platform
@@ -74,7 +75,6 @@ class DrawController {
 
     @FXML
     fun initialize() {
-
         Init.initCanvas(gameCanvas, tempCanvas, canvasContainer)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
@@ -210,12 +210,7 @@ class DrawController {
 
     fun onDisconnect() {
         gameCanvas.isDisable = true
-
-        val alert = Alert(Alert.AlertType.ERROR)
-        alert.title = "Связь потеряна"
-        alert.headerText = "Сервер отключился"
-        alert.contentText = "Вы будете возвращены в лобби."
-        alert.showAndWait()
+        UIUtils.createAlert(Alert.AlertType.ERROR, "Связь потеряна", "Сервер отключился", "Вы будете возвращены в лобби.")
 
         val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("lobby-view.fxml"))
         val root = fxmlLoader.load<Parent>()

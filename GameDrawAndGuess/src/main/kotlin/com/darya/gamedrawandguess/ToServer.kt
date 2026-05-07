@@ -12,7 +12,7 @@ class ToServer(private val controller: DrawController) {
 
     fun connect(chat: TextArea, gameCanvas: Canvas, tempCanvas: Canvas, ip: String, port: Int): Socket? {
         try {
-            socket = Socket(ip, port)     // 10.177.142.105    192.168.100.11
+            socket = Socket(ip, port)
             startListening(chat, gameCanvas, tempCanvas)
             chat.appendText("Вы подключены к серверу!\n")
             return socket

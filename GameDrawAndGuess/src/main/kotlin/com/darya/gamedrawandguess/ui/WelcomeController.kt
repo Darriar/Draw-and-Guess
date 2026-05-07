@@ -1,6 +1,7 @@
 package com.darya.gamedrawandguess.ui
 
 import com.darya.gamedrawandguess.DrawApplication
+import com.darya.gamedrawandguess.util.UIUtils
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -28,16 +29,9 @@ class WelcomeController {
             val lobbyController = fxmlLoader.getController<LobbyController>()
             lobbyController.setUserName(userName)
         } else {
-            createAlert(Alert.AlertType.INFORMATION, "Ошибка ввода имени игрока!", "Пустое имя", "Введите имя игрока!")
+            UIUtils.createAlert(Alert.AlertType.INFORMATION, "Ошибка ввода имени игрока!", "Пустое имя", "Введите имя игрока!")
         }
     }
 
-    fun createAlert(type: Alert.AlertType, titleA: String, headerA: String, contentA: String): Alert {
-        return  Alert(type).apply {
-            title = titleA
-            headerText = headerA
-            contentText = contentA
-            showAndWait()
-        }
-    }
+
 }
