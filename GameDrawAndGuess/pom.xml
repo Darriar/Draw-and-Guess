@@ -17,11 +17,10 @@
     </properties>
 
     <dependencies>
-        <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>21</version>
+            <version>21.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -29,21 +28,18 @@
             <version>21</version>
         </dependency>
 
-        <!-- Kotlin Serialization -->
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-serialization-json-jvm</artifactId>
             <version>${serialization.version}</version>
         </dependency>
 
-        <!-- Kotlin Stdlib -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
 
-        <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -60,7 +56,6 @@
 
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -105,43 +100,29 @@
                 <executions>
                     <execution>
                         <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
+                        <goals> <goal>shade</goal> </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.darya.gamedrawandguess.Launcher</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
-                                        <exclude>META-INF/DEPENDENCIES</exclude>
-                                        <exclude>META-INF/LICENSE*</exclude>
-                                        <exclude>META-INF/NOTICE*</exclude>
-                                        <exclude>META-INF/kotlin-stdlib.kotlin_module</exclude>
-                                        <exclude>META-INF/kotlinx-serialization-json.kotlin_module</exclude>
-                                        <!-- Часто прилетает из сторонних библиотек -->
-                                        <exclude>**/pom.properties</exclude>
-                                        <exclude>**/pom.xml</exclude>
-                                        <!-- Исключаем дубликаты манифестов и подписей библиотек -->
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
-                                        <!-- Исключаем module-info из зависимостей, чтобы они не конфликтовали с вашим -->
                                         <exclude>module-info.class</exclude>
                                         <exclude>META-INF/versions/9/module-info.class</exclude>
-                                        <!-- Убираем лишние конфиги JavaFX для мобильных платформ -->
                                         <exclude>META-INF/substrate/config/**</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
-                            <transformers>
-                                <!-- Этот трансформер объединяет все MANIFEST.MF в один правильный -->
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.darya.gamedrawandguess.Launcher</mainClass>
-                                </transformer>
-                                <!-- Объединяет служебные файлы (важно для работы библиотек) -->
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                            </transformers>
                         </configuration>
                     </execution>
                 </executions>

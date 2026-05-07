@@ -40,9 +40,6 @@ class ProcessEvent(private val controller: DrawController,
         }
 
         events[GameEvent.RoundStart::class] = { event ->
-            Drawing.clearDrawingHistory()
-            Drawing.clearCanvas(gameCanvas)
-            Drawing.clearCanvas(tempCanvas)
             val roundInfo = event as GameEvent.RoundStart
             controller.updateTimer(roundInfo.seconds)
 
@@ -53,6 +50,10 @@ class ProcessEvent(private val controller: DrawController,
                 controller.setCurrentPainter(roundInfo.painterName)
                 controller.setDrawingMode(false)
             }
+
+            Drawing.clearDrawingHistory()
+            Drawing.clearCanvas(gameCanvas)
+            Drawing.clearCanvas(tempCanvas)
         }
 
         events[GameEvent.RoundEnd::class] = {event ->

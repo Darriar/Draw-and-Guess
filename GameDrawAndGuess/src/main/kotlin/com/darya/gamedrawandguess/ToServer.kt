@@ -31,10 +31,7 @@ class ToServer(private val controller: DrawController) {
             try {
                 while (input.hasNextLine()) {
                     val message = input.nextLine()
-
-                    Platform.runLater {
-                        eventHandler.processMessage(message)
-                    }
+                    eventHandler.processMessage(message)
                 }
             } catch (e: Exception) {
                 Platform.runLater {
@@ -43,7 +40,7 @@ class ToServer(private val controller: DrawController) {
             } finally {
                 Platform.runLater {
                     chat.appendText("Соединение с сервером потеряно.\n")
-                    controller.onDisconnect() // Вызываем метод в контроллере
+                    controller.onDisconnect()
                 }
                 socket?.close()
                 socket = null

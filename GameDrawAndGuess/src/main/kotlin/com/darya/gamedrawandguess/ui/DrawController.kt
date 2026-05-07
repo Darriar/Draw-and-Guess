@@ -8,6 +8,7 @@ import com.darya.gamedrawandguess.model.PlayerInfo
 import com.darya.gamedrawandguess.model.ShapeType
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
+import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.fxml.FXML
@@ -167,7 +168,9 @@ class DrawController {
 
     fun updateTimer(seconds: Int) {
         timeLine?.stop()
-        var timeLeft = seconds
+        var timeLeft = seconds - 1
+
+        timerLabel.text = "Осталось: $seconds"
 
         timeLine = Timeline(KeyFrame(Duration.seconds(1.0), {
             timeLeft--

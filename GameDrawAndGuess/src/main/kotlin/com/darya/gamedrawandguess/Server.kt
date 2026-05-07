@@ -73,10 +73,6 @@ class Server {
     @Synchronized
     fun addClient(client: ClientHandler) {
         clients.forEach { client.sendEvent(GameEvent.AddClient(it.id, it.userName, it.score)) }
-        /*for (shape in drawingHistory) {
-            client.sendEvent(shape)
-        }*/
-
 
         clients.add(client)
         broadcast(GameEvent.AddClient(client.id, client.userName, client.score))
@@ -112,6 +108,8 @@ class Server {
     }
 
     private fun startRound() {
+        roundStartTime = System.currentTimeMillis()
+
         val startCoords = List(2) {GameEvent.Point(0.0, 0.0)}
         broadcast(GameEvent.DrawShape(ShapeType.CLEAR, startCoords, Color.WHITE.toString(), 0.0,false))
         drawingHistory.clear()
@@ -124,7 +122,6 @@ class Server {
 
         currentPainter = setPainter()
         keyWord = fileManager.getNextWord()
-        roundStartTime = System.currentTimeMillis()
 
 
         clients.forEach { client ->
