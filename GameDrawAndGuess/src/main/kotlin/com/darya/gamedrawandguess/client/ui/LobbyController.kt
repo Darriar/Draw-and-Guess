@@ -1,7 +1,7 @@
-package com.darya.gamedrawandguess.ui
+package com.darya.gamedrawandguess.client.ui
 
-import com.darya.gamedrawandguess.Server
-import com.darya.gamedrawandguess.ClientHandler
+import com.darya.gamedrawandguess.server.Server
+import com.darya.gamedrawandguess.server.ClientHandler
 import com.darya.gamedrawandguess.DrawApplication
 import javafx.scene.Scene
 import javafx.application.Platform

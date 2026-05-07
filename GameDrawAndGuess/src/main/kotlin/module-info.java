@@ -6,10 +6,13 @@ module com.darya.gamedrawandguess {
     requires kotlinx.serialization.core;
     requires kotlinx.serialization.json;
 
+    opens com.darya.gamedrawandguess.client.ui to javafx.fxml;
     opens com.darya.gamedrawandguess to javafx.fxml;
-    opens com.darya.gamedrawandguess.ui to javafx.fxml;
 
      opens com.darya.gamedrawandguess.model to kotlinx.serialization.core;
 
     exports com.darya.gamedrawandguess;
+    exports com.darya.gamedrawandguess.client.ui;
+    exports com.darya.gamedrawandguess.client.network;
+    exports com.darya.gamedrawandguess.model;
 }

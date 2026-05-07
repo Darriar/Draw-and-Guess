@@ -1,9 +1,9 @@
-package com.darya.gamedrawandguess.ui
+package com.darya.gamedrawandguess.client.ui
 
 import com.darya.gamedrawandguess.DrawApplication
-import com.darya.gamedrawandguess.drawingpart.Drawing
-import com.darya.gamedrawandguess.GameClient
-import com.darya.gamedrawandguess.ProcessEvent
+import com.darya.gamedrawandguess.client.drawingpart.Drawing
+import com.darya.gamedrawandguess.client.network.ProcessEvent
+import com.darya.gamedrawandguess.client.network.GameClient
 import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.model.PlayerInfo
 import com.darya.gamedrawandguess.model.ShapeType
@@ -25,9 +25,6 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.stage.Stage
 import javafx.util.Duration
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.io.PrintWriter
 import kotlin.math.abs
 
 class DrawController {
@@ -78,7 +75,7 @@ class DrawController {
         Init.initCanvas(gameCanvas, tempCanvas, canvasContainer)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
-        Init.initToolButtons(toolsVBox, undoBtn, redoBtn) { selectedType ->  currentTool = selectedType}
+        Init.initToolButtons(toolsVBox, undoBtn, redoBtn) { selectedType -> currentTool = selectedType }
         gc = Init.initGraphicContext(gameCanvas, sizeSlider, colorPicker)
         playersInfo.addListener(ListChangeListener {
             val nodes = playersInfo.map { createPlayerRow(it) }
@@ -92,7 +89,7 @@ class DrawController {
         val eventHandler = ProcessEvent(this, chatTextArea, gameCanvas, tempCanvas)
         if (!gameClient!!.connect(ip, port, eventHandler)) return false
 
-        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, clearBtn, undoBtn, redoBtn, { currentTool }, {event -> gameClient?.sendEvent(event) })
+        Drawing.setupDrawingEvents(gameCanvas, tempCanvas, colorPicker, sizeSlider, clearBtn, undoBtn, redoBtn, { currentTool }, { event -> gameClient?.sendEvent(event) })
         return true
     }
 

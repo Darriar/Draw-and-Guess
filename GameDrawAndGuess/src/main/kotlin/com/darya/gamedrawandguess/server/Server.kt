@@ -1,4 +1,4 @@
-package com.darya.gamedrawandguess
+package com.darya.gamedrawandguess.server
 
 import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.model.ShapeType

@@ -1,6 +1,6 @@
-package com.darya.gamedrawandguess.ui
+package com.darya.gamedrawandguess.client.ui
 
-import com.darya.gamedrawandguess.drawingpart.Drawing
+import com.darya.gamedrawandguess.client.drawingpart.Drawing
 import com.darya.gamedrawandguess.model.ShapeType
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext

@@ -1,4 +1,4 @@
-package com.darya.gamedrawandguess.ui
+package com.darya.gamedrawandguess.client.ui
 
 import com.darya.gamedrawandguess.DrawApplication
 import com.darya.gamedrawandguess.util.UIUtils

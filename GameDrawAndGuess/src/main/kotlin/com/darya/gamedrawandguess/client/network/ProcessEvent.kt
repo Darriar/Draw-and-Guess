@@ -1,9 +1,9 @@
-package com.darya.gamedrawandguess
+package com.darya.gamedrawandguess.client.network
 
-import com.darya.gamedrawandguess.drawingpart.Drawing
+import com.darya.gamedrawandguess.client.drawingpart.Drawing
 import com.darya.gamedrawandguess.model.GameEvent
 import com.darya.gamedrawandguess.model.ShapeType
-import com.darya.gamedrawandguess.ui.DrawController
+import com.darya.gamedrawandguess.client.ui.DrawController
 import javafx.application.Platform
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.TextArea

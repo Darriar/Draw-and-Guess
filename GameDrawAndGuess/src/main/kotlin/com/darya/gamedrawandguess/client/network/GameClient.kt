@@ -1,7 +1,7 @@
-package com.darya.gamedrawandguess
+package com.darya.gamedrawandguess.client.network
 
+import com.darya.gamedrawandguess.client.ui.DrawController
 import com.darya.gamedrawandguess.model.GameEvent
-import com.darya.gamedrawandguess.ui.DrawController
 import javafx.application.Platform
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
