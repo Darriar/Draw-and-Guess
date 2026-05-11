@@ -13,7 +13,7 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.StrokeLineCap
-
+import java.io.InputStream
 
 
 object Init {
@@ -79,21 +79,29 @@ object Init {
         configureButton(redoBtn, ShapeType.REDO)
     }
 
-    private fun configureButton(button: Button, type: ShapeType) {
+    fun configureButton(button: Button, type: ShapeType? = null, imagePath: String? = null) {
         button.maxWidth = Double.MAX_VALUE
         button.styleClass.add("tool-button")
-        button.tooltip = Tooltip(type.label)
 
-        val stream = ShapeType::class.java.getResourceAsStream(type.imagePath)
-        if (stream != null) {
-            button.graphic = ImageView(Image(stream)).apply {
+        val imageUrl: String? = when {
+            type != null -> {
+                button.tooltip = Tooltip(type.label)
+                ShapeType::class.java.getResource(type.imagePath)?.toExternalForm()
+            }
+            imagePath != null -> {
+                this::class.java.getResource(imagePath)?.toExternalForm()
+            }
+            else -> null
+        }
+
+        if (imageUrl != null) {
+            button.graphic = ImageView(Image(imageUrl)).apply {
                 fitWidth = 30.0
                 fitHeight = 30.0
                 isPreserveRatio = true
             }
         } else {
-            button.text = type.label // Если картинки нет, показываем текст
-            println("empty image ${type.label}")
+            println("Ошибка: Изображение не найдено для кнопки ${button.id ?: "без ID"}")
         }
     }
 

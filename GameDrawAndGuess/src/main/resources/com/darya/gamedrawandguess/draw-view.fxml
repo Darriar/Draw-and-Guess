@@ -22,18 +22,6 @@
         <Insets bottom="30.0" left="30.0" right="30.0" top="20.0" />
     </padding>
 
-    <top>
-        <VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
-            <children>
-                <Label fx:id="timerLabel" styleClass="timer-badge" text="00:34" />
-                <Label fx:id="statusLabel" styleClass="hint-label" text="Подсказка: Напиток" />
-            </children>
-            <padding>
-                <Insets bottom="20.0" />
-            </padding>
-        </VBox>
-    </top>
-
     <left>
         <VBox prefWidth="220.0" spacing="20.0" styleClass="side-card">
             <padding>
@@ -130,4 +118,17 @@
             </BorderPane.margin>
         </VBox>
     </right>
+   <top>
+      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="backBtn" mnemonicParsing="false" onAction="#onBackBtnClick" />
+            <VBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="1065.0">
+               <children>
+                      <Label fx:id="timerLabel" styleClass="timer-badge" text="00:34" />
+                      <Label fx:id="statusLabel" styleClass="hint-label" text="Подсказка: Напиток" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </top>
 </BorderPane>

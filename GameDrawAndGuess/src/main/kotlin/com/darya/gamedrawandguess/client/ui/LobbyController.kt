@@ -53,15 +53,13 @@ class LobbyController {
                         val ip = parts[1]
                         val port = parts[2].toInt()
                         val roomKey = "$ip:$port"
-
-                        // Если комната новая — добавляем кнопку в UI
+                        
                         if (!roomLastSeen.containsKey(roomKey)) {
                             Platform.runLater {
                                 addRoomToUI(ip, roomName, port)
                             }
                         }
 
-                        // Обновляем время последнего "сигнала"
                         roomLastSeen[roomKey] = System.currentTimeMillis()
                     }
                 }
@@ -73,24 +71,20 @@ class LobbyController {
             }
         }.apply {
             isDaemon = true
-            name = "DiscoveryThread"
         }.start()
     }
 
-    // Простой поток, который раз в 5 секунд удаляет пропавшие комнаты
     private fun startCleanupTask() {
         Thread {
             while (true) {
                 Thread.sleep(5000)
                 val now = System.currentTimeMillis()
 
-                // Находим ключи комнат, которые молчат более 10 секунд
                 val expiredRooms = roomLastSeen.filter { now - it.value > 10000 }.keys
 
                 if (expiredRooms.isNotEmpty()) {
                     Platform.runLater {
                         expiredRooms.forEach { key ->
-                            // Удаляем кнопку из VBox, если её текст содержит IP:Port комнаты
                             lobbyVBox.children.removeIf { node ->
                                 (node as? Button)?.text?.contains(key) == true
                             }

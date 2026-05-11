@@ -38,7 +38,7 @@ class GameClient(private val controller: DrawController) {
             } catch (e: Exception) {
                 Platform.runLater{ println("Соединение разорвано.\n") }
             } finally {
-                Platform.runLater { controller.onDisconnect() }
+                Platform.runLater { controller.onDisconnect(true) }
                 close()
             }
         }.apply { isDaemon = true }.start()

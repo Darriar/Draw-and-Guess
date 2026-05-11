@@ -60,13 +60,14 @@ class DrawController {
     private lateinit var undoBtn: Button
     @FXML
     private lateinit var redoBtn: Button
+    @FXML
+    private lateinit var backBtn: Button
 
 
     private lateinit var gc: GraphicsContext
     private var currentTool: ShapeType = ShapeType.PENCIL
     private var userName: String = ""
     private var timeLine: Timeline? = null
-    private lateinit var serverConnection: GameClient
     private var playersInfo =  FXCollections.observableArrayList<PlayerInfo>()
     private var gameClient: GameClient? = null
 
@@ -75,6 +76,7 @@ class DrawController {
         Init.initCanvas(gameCanvas, tempCanvas, canvasContainer)
         Init.initSizeSlider(sizeSlider)
         Init.initColorPicker(colorPicker)
+        Init.configureButton(backBtn, imagePath = "/images/back.png")
         Init.initToolButtons(toolsVBox, undoBtn, redoBtn) { selectedType -> currentTool = selectedType }
         gc = Init.initGraphicContext(gameCanvas, sizeSlider, colorPicker)
         playersInfo.addListener(ListChangeListener {
@@ -206,14 +208,23 @@ class DrawController {
         playersPane.isManaged = !isPainterMode
     }
 
-    fun onDisconnect() {
-        gameCanvas.isDisable = true
-        UIUtils.createAlert(Alert.AlertType.ERROR, "Связь потеряна", "Сервер отключился", "Вы будете возвращены в лобби.")
+
+    fun onDisconnect(showAlert: Boolean) {
+        if (showAlert)
+            UIUtils.createAlert(Alert.AlertType.ERROR, "Связь потеряна", "Сервер отключился", "Вы будете возвращены в лобби.")
 
         val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("lobby-view.fxml"))
         val root = fxmlLoader.load<Parent>()
+
+        val lobbyController = fxmlLoader.getController<LobbyController>()
+        lobbyController.setUserName(userName)
+
         val stage = gameCanvas.scene.window as Stage
         stage.scene = Scene(root)
+    }
+
+    fun onBackBtnClick() {
+        onDisconnect(false)
     }
 
 }
