@@ -187,7 +187,6 @@ class DrawController {
         timerLabel.text = "Конец раунда!"
     }
 
-
     fun blockCanvas() {
         tempCanvas.disableProperty().set(true)
         toolsPane.isVisible = false
@@ -207,7 +206,6 @@ class DrawController {
         playersPane.isVisible = !isPainterMode
         playersPane.isManaged = !isPainterMode
     }
-
 
     fun onDisconnect(showAlert: Boolean) {
         if (showAlert)

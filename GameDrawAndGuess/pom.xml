@@ -127,6 +127,42 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>jpackage</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>jpackage</executable>
+                            <arguments>
+                                <argument>--type</argument>
+                                <argument>app-image</argument>
+
+                                <argument>--input</argument>
+                                <argument>${project.build.directory}</argument>
+
+                                <argument>--dest</argument>
+                                <argument>${project.basedir}/build-dist</argument>
+
+                                <argument>--name</argument>
+                                <argument>DrawAndGuess</argument>
+
+                                <argument>--main-jar</argument>
+                                <argument>${project.build.finalName}.jar</argument>
+
+                                <argument>--main-class</argument>
+                                <argument>com.darya.gamedrawandguess.Launcher</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
