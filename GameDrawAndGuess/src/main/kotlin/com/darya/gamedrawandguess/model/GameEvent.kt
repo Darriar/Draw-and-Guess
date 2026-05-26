@@ -41,4 +41,9 @@ sealed interface GameEvent {
 
     @Serializable @SerialName("update_score")   // переимееновать в угада слово
     data class UpdateScore(val id: Int, val score: Int): GameEvent
+
+    @Serializable @SerialName("close_server")
+    data class CloseServer(val closeMessage: String) : GameEvent
+
+
 }

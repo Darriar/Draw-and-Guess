@@ -27,6 +27,9 @@ class ClientHandler(private val socket: Socket, private val server: Server): Thr
                 val jsonMessage = input.nextLine()
 
                 val event = Json.decodeFromString<GameEvent>(jsonMessage)
+                if (event is GameEvent.CloseServer) {
+                    break
+                }
                 server.handleIncomingEvent(event, this)
 
             }

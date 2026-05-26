@@ -25,6 +25,8 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.stage.Stage
 import javafx.util.Duration
+import java.io.PrintWriter
+import java.net.Socket
 import kotlin.math.abs
 
 class DrawController {
@@ -62,7 +64,6 @@ class DrawController {
     private lateinit var redoBtn: Button
     @FXML
     private lateinit var backBtn: Button
-
 
     private lateinit var gc: GraphicsContext
     private var currentTool: ShapeType = ShapeType.PENCIL
@@ -207,7 +208,7 @@ class DrawController {
         playersPane.isManaged = !isPainterMode
     }
 
-    fun onDisconnect(showAlert: Boolean) {
+    /*fun onDisconnect(showAlert: Boolean) {
         if (showAlert)
             UIUtils.createAlert(Alert.AlertType.ERROR, "Связь потеряна", "Сервер отключился", "Вы будете возвращены в лобби.")
 
@@ -219,9 +220,34 @@ class DrawController {
 
         val stage = gameCanvas.scene.window as Stage
         stage.scene = Scene(root)
+    }*/
+
+    fun onDisconnect(showAlert: Boolean) {
+        val stage = gameCanvas.scene?.window as? Stage
+
+        if (stage == null) {
+            println("Дисконнект проигнорирован: мы уже вышли из игрового экрана.")
+            return
+        }
+
+
+        if (showAlert) {
+            UIUtils.createAlert(
+                Alert.AlertType.ERROR, "Связь потеряна", "Сервер отключился", "Вы будете возвращены в лобби.")
+        }
+
+        val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("lobby-view.fxml"))
+        val root = fxmlLoader.load<Parent>()
+
+        val lobbyController = fxmlLoader.getController<LobbyController>()
+        lobbyController.setUserName(userName)
+
+        stage.scene = Scene(root)
     }
 
+
     fun onBackBtnClick() {
+        gameClient?.sendEvent(GameEvent.CloseServer("CLOSE_SERVER"))
         onDisconnect(false)
     }
 

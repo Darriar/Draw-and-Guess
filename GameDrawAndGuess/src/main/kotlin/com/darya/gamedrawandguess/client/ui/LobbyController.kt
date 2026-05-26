@@ -1,8 +1,9 @@
 package com.darya.gamedrawandguess.client.ui
 
+
 import com.darya.gamedrawandguess.server.Server
-import com.darya.gamedrawandguess.server.ClientHandler
 import com.darya.gamedrawandguess.DrawApplication
+import com.darya.gamedrawandguess.server.ClientHandler
 import javafx.scene.Scene
 import javafx.application.Platform
 import javafx.fxml.FXML
@@ -53,7 +54,7 @@ class LobbyController {
                         val ip = parts[1]
                         val port = parts[2].toInt()
                         val roomKey = "$ip:$port"
-                        
+
                         if (!roomLastSeen.containsKey(roomKey)) {
                             Platform.runLater {
                                 addRoomToUI(ip, roomName, port)
@@ -145,17 +146,29 @@ class LobbyController {
 
     private fun startBroadcasting(ip: String, port: Int) {
         Thread {
-            val socket = DatagramSocket()
-            socket.broadcast = true
-            val message = "Комната ${userName}|$ip|$port".toByteArray()
+            var socket: DatagramSocket? = null
+            try {
+                socket = DatagramSocket()
+                socket.broadcast = true
 
-            while (true) {
-                val packet = DatagramPacket(
-                    message, message.size,
-                    InetAddress.getByName("255.255.255.255"), 8888
-                )
-                socket.send(packet)
-                Thread.sleep(3000)
+                val message = "Комната ${userName}|$ip|$port".toByteArray()
+                val subnetBroadcast = InetAddress.getByName("192.168.100.255")
+                println("Начата отправка бродкаста на адрес ${subnetBroadcast.hostAddress}...")
+
+                while (!Thread.currentThread().isInterrupted) {
+                    val packet = DatagramPacket(
+                        message, message.size,
+                        subnetBroadcast, 8888
+                    )
+                    socket.send(packet)
+                    Thread.sleep(3000)
+                }
+            } catch (e: Exception) {
+                println("Ошибка бродкаста: ${e.message}")
+                e.printStackTrace()
+            } finally {
+                socket?.close()
+                println("Поток бродкаста завершил работу.")
             }
         }.apply { isDaemon = true }.start()
     }

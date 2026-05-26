@@ -107,7 +107,7 @@ class Server {
     }
 
     private fun startRound() {
-        if (clients.isEmpty()) {
+        if (!isGameStarted || clients.isEmpty()) {
             isGameStarted = false
             return
         }
@@ -128,7 +128,9 @@ class Server {
             client.sendEvent(GameEvent.RoundStart(currentPainter?.userName ?: "", ROUND_TIME_IN_SECONDS, word))
         }
 
-        currentRoundTask = scheduler.schedule({ stopRound() }, ROUND_TIME_IN_SECONDS.toLong(), TimeUnit.SECONDS)
+        if (!scheduler.isShutdown) {
+            currentRoundTask = scheduler.schedule({ stopRound() }, ROUND_TIME_IN_SECONDS.toLong(), TimeUnit.SECONDS)
+        }
     }
 
     private fun forceStopRound() {
@@ -141,11 +143,15 @@ class Server {
     }
 
     private fun stopRound() {
+        if (!isGameStarted) return
+
         broadcast(GameEvent.RoundEnd(keyWord!!))
         keyWord = null
-        currentRoundTask = scheduler.schedule({
-            startRound()
-        }, 3, TimeUnit.SECONDS)
+        if (!scheduler.isShutdown) {
+            currentRoundTask = scheduler.schedule({
+                startRound()
+            }, 3, TimeUnit.SECONDS)
+        }
     }
 
 

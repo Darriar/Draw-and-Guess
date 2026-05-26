@@ -36,12 +36,4 @@ class DrawApplication : Application() {
     }
 }
 
-/*fun main() {
-    Application.launch(DrawApplication::class.java)
-}*/
 
-
-
-// сделать красивые алерты
-
-// runLater
