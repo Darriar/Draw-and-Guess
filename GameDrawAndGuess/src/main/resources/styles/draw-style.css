@@ -40,7 +40,6 @@
     -fx-background-radius: 8;
 }
 
-/* Инструменты левая панель */
 .tool-button {
     -fx-background-color: white;
     -fx-background-radius: 12;
@@ -73,7 +72,6 @@
     -fx-effect: null;
 }
 
-/* Цвет и слайдер */
 .modern-picker {
 -fx-background-color: white;
 -fx-background-radius: 12;
@@ -188,7 +186,6 @@
 -fx-border-color: #3da845;
 }
 
-/* Игроки и чат */
 .player-row-container {
     -fx-padding: 8 12;
     -fx-border-color: #f0f2f5;

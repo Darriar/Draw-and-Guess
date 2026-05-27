@@ -222,7 +222,7 @@ object Drawing {
         if (redoStack.isNotEmpty()) {
             val move = redoStack.removeLast()
             drawShape(move, gameCanvas)
-            addShapeToDrawingHistory(move)
+            drawingHistory.add(move)
         }
     }
 

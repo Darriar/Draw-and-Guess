@@ -4,7 +4,6 @@ package com.darya.gamedrawandguess.client.ui
 import com.darya.gamedrawandguess.server.Server
 import com.darya.gamedrawandguess.DrawApplication
 import com.darya.gamedrawandguess.server.ClientHandler
-import javafx.scene.Scene
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -12,6 +11,9 @@ import javafx.scene.Parent
 import javafx.scene.control.Button
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.InetAddress
 import java.net.*
 
 class LobbyController {
@@ -60,7 +62,6 @@ class LobbyController {
                                 addRoomToUI(ip, roomName, port)
                             }
                         }
-
                         roomLastSeen[roomKey] = System.currentTimeMillis()
                     }
                 }
@@ -68,7 +69,6 @@ class LobbyController {
                 println("Ошибка поиска комнат: ${e.message}")
             } finally {
                 socket?.close()
-                println("Поток поиска комнат остановлен.")
             }
         }.apply {
             isDaemon = true
@@ -108,7 +108,7 @@ class LobbyController {
             if (drawController.attemptConnection(ip, port)) {
                 drawController.setUserName(userName)
                 val stage = lobbyVBox.scene.window as Stage
-                stage.scene = Scene(mainRoot)
+                stage.scene.root = mainRoot
             } else {
                 println("Ошибка: не удалось подключиться к $ip:$port")
             }
@@ -150,10 +150,9 @@ class LobbyController {
             try {
                 socket = DatagramSocket()
                 socket.broadcast = true
+                val subnetBroadcast = getBroadcastFromIpConfig()
 
                 val message = "Комната ${userName}|$ip|$port".toByteArray()
-                val subnetBroadcast = InetAddress.getByName("192.168.100.255")
-                println("Начата отправка бродкаста на адрес ${subnetBroadcast.hostAddress}...")
 
                 while (!Thread.currentThread().isInterrupted) {
                     val packet = DatagramPacket(
@@ -171,5 +170,30 @@ class LobbyController {
                 println("Поток бродкаста завершил работу.")
             }
         }.apply { isDaemon = true }.start()
+    }
+
+    private fun getBroadcastFromIpConfig(): InetAddress {
+        try {
+            val process = ProcessBuilder("cmd", "/c", "chcp 866 && ipconfig").start()
+            val output = BufferedReader(InputStreamReader(process.inputStream, "CP866")).use { it.readText() }
+            process.waitFor()
+
+            val wirelessBlock = output.substringAfter("Адаптер беспроводной локальной сети Беспроводная сеть")
+                .substringBefore("адаптер")
+
+            val ip = Regex("""IPv4-адрес[\s.]*:\s*([\d.]+)""").find(wirelessBlock)?.groupValues?.get(1)
+            val mask = Regex("""Маска подсети[\s.]*:\s*([\d.]+)""").find(wirelessBlock)?.groupValues?.get(1)
+
+            if (ip != null && mask != null) {
+                val ipParts = ip.split(".").map { it.toInt() }
+                val maskParts = mask.split(".").map { it.toInt() }
+
+                val broadcastStr = List(4) { i -> ipParts[i] or (maskParts[i].inv() and 0xFF) }.joinToString(".")
+                return InetAddress.getByName(broadcastStr)
+            }
+        } catch (e: Exception) {
+            println("Ошибка при парсинге ipconfig: ${e.message}")
+        }
+        return InetAddress.getByName("255.255.255.255")
     }
 }

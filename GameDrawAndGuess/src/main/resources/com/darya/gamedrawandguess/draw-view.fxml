@@ -118,17 +118,24 @@
             </BorderPane.margin>
         </VBox>
     </right>
-   <top>
-      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button fx:id="backBtn" mnemonicParsing="false" onAction="#onBackBtnClick" />
-            <VBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="1065.0">
-               <children>
-                      <Label fx:id="timerLabel" styleClass="timer-badge" text="00:34" />
-                      <Label fx:id="statusLabel" styleClass="hint-label" text="Подсказка: Напиток" />
-               </children>
-            </VBox>
-         </children>
-      </HBox>
-   </top>
+    <top>
+        <BorderPane prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <left>
+                <Button fx:id="backBtn" mnemonicParsing="false" onAction="#onBackBtnClick" BorderPane.alignment="CENTER" />
+            </left>
+
+            <center>
+                <VBox alignment="CENTER" prefHeight="100.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label fx:id="timerLabel" styleClass="timer-badge" text="00:34" />
+                        <Label fx:id="statusLabel" styleClass="hint-label" text="Подсказка: Напиток" />
+                    </children>
+                </VBox>
+            </center>
+
+            <right>
+                <HBox prefWidth="60.0" BorderPane.alignment="CENTER" />
+            </right>
+        </BorderPane>
+    </top>
 </BorderPane>

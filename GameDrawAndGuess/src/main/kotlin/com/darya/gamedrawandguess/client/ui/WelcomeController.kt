@@ -24,7 +24,7 @@ class WelcomeController {
             val fxmlLoader = FXMLLoader(DrawApplication::class.java.getResource("lobby-view.fxml"))
             val mainRoot = fxmlLoader.load<Parent>()
             val stage = startBtn.scene.window as Stage
-            stage.scene = Scene(mainRoot)
+            stage.scene.root = mainRoot
 
             val lobbyController = fxmlLoader.getController<LobbyController>()
             lobbyController.setUserName(userName)

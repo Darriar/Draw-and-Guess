@@ -1,5 +1,3 @@
-@file:Suppress("PLUGIN_IS_NOT_ENABLED")
-
 package com.darya.gamedrawandguess.model
 
 import javafx.scene.paint.Color
@@ -42,8 +40,6 @@ sealed interface GameEvent {
     @Serializable @SerialName("update_score")   // переимееновать в угада слово
     data class UpdateScore(val id: Int, val score: Int): GameEvent
 
-    @Serializable @SerialName("close_server")
-    data class CloseServer(val closeMessage: String) : GameEvent
-
-
+    @Serializable @SerialName("back_to_lobby")
+    data object BackToLobby : GameEvent
 }

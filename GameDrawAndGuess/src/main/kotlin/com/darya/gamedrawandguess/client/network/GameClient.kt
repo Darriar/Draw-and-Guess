@@ -15,8 +15,8 @@ class GameClient(private val controller: DrawController) {
 
     fun connect(ip: String, port: Int, eventHandler: ProcessEvent): Boolean {
         try {
-           socket = Socket(ip, port)
-           out = PrintWriter(socket!!.getOutputStream(), true)
+            socket = Socket(ip, port)
+            out = PrintWriter(socket!!.getOutputStream(), true)
             startListening(eventHandler)
             return true
         } catch (e: Exception) {

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 class Server {
     private val clients = CopyOnWriteArrayList<ClientHandler>()
 
-    @Volatile private var currentPainter: ClientHandler? = null
+    private var currentPainter: ClientHandler? = null
     private var currentPainterIndex: Int = -1
 
     private val scheduler = Executors.newSingleThreadScheduledExecutor()
@@ -20,7 +20,7 @@ class Server {
     private val ROUND_TIME_IN_SECONDS = 120
     private val MAX_NUMBER_OF_SCORES = 100
 
-    @Volatile private var isGameStarted = false
+    private var isGameStarted = false
 
     private val fileManager = FileManager
     private var keyWord: String? = null
@@ -106,6 +106,7 @@ class Server {
         return clients[currentPainterIndex]
     }
 
+    @Synchronized
     private fun startRound() {
         if (!isGameStarted || clients.isEmpty()) {
             isGameStarted = false
@@ -133,6 +134,7 @@ class Server {
         }
     }
 
+    @Synchronized
     private fun forceStopRound() {
         val canceled = currentRoundTask?.cancel(false)
 
@@ -142,6 +144,7 @@ class Server {
         }
     }
 
+    @Synchronized
     private fun stopRound() {
         if (!isGameStarted) return
 
